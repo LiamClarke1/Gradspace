@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"/Users/liamclarke/Gradspace -SA/SKILL-3.md\" \"/Users/liamclarke/.claude/skills/skill-builder/SKILL.md\")",
+      "Bash(cp \"/Users/liamclarke/Gradspace -SA/reference.md\" \"/Users/liamclarke/.claude/skills/skill-builder/reference.md\")",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:gradspace.co.za)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(python3 -c \"import sys,json,base64; d=json.load\\(sys.stdin\\); print\\(base64.b64decode\\(d['content']\\).decode\\(\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; items=json.load\\(sys.stdin\\); print\\('\\\\n'.join\\([i['name'] for i in items]\\)\\)\")",
+      "WebFetch(domain:fluid.glass)",
+      "Bash(open \"/Users/liamclarke/Gradspace -SA/index.html\")",
+      "WebFetch(domain:www.vastspace.com)",
+      "WebSearch",
+      "Bash(curl -s \"https://gradspace.co.za/wp-json/wp/v2/types\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(curl -s \"https://gradspace.co.za/wp-json/wp/v2/posts?per_page=20&_fields=id,title,slug,meta\")",
+      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) for post in data: print\\('SLUG:', post.get\\('slug'\\)\\) meta = post.get\\('meta', {}\\) if meta: print\\('META:', json.dumps\\(meta, indent=2\\)[:300]\\) \")",
+      "Bash(curl -s \"https://gradspace.co.za/wp-json/acf/v3/posts\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d, indent=2\\)[:2000]\\)\")",
+      "Bash(curl -s \"https://gradspace.co.za/wp-json/wp/v2/sale?per_page=20&_fields=id,title,content,slug\")",
+      "Bash(python3 -c \" import json, sys, re data = json.load\\(sys.stdin\\) for post in data: slug = post.get\\('slug',''\\) title = post.get\\('title', {}\\).get\\('rendered', ''\\) content = post.get\\('content', {}\\).get\\('rendered', ''\\) text = re.sub\\('<[^>]+>', ' ', content\\) text = re.sub\\(r'\\\\s+', ' ', text\\).strip\\(\\) print\\(f'SLUG: {slug}'\\) print\\(f'TITLE: {title}'\\) print\\(f'CONTENT: {text[:800]}'\\) print\\(\\) \")"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}

@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gradspace — Premium Student Living in Stellenbosch</title>
+  <meta name="description" content="Seven premium student addresses in Stellenbosch. Walking distance from campus. Communal living, elevated." />
+
+  <!-- ═══ FONT STACK ═══════════════════════════════════════════
+    Cormorant Garamond  — editorial display / headlines
+    Syne                — brand / UI labels / eyebrows
+    DM Sans             — body copy / forms / captions
+  ═══════════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <style>
+
+  /* ════════════════════════════════════════════════════════════
+     0.  DESIGN TOKENS
+     All palette values live here.  One source of truth.
+  ════════════════════════════════════════════════════════════ */
+  :root {
+    /* Colour */
+    --ink:      #0b0b0a;
+    --ink-2:    #131312;
+    --ink-3:    #1c1b1a;
+    --cream:    #f2ede6;
+    --mist:     #b9b2a9;
+    --smoke:    #706c67;
+    --gold:     #c9a96e;
+    --gold-d:   #9e7d46;
+    --sage:     #7a9480;
+    --sage-dim: #4e6657;
+    --linen:    #f0ebe2;
+
+    /* Placeholder palette — warm gradient landscape */
+    --ph-sky:       #1b2c42;
+    --ph-mountain:  #2e4a5e;
+    --ph-ridge:     #3d5c4a;
+    --ph-vale:      #5c7060;
+    --ph-earth:     #7a6448;
+    --ph-warm:      #a8855c;
+
+    /* Easing */
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --snap: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Type */
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-brand:   'Syne', sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     1.  RESET
+  ════════════════════════════════════════════════════════════ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 62.5%; -webkit-font-smoothing: antialiased; scroll-behavior: auto; }
+  body { background: var(--ink); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; }
+  a { color: inherit; text-decoration: none; }
+  img, video { display: block; width: 100%; height: 100%; object-fit: cover; }
+  ul { list-style: none; }
+  button { cursor: none; font: inherit; background: none; border: none; }
+
+  /* ════════════════════════════════════════════════════════════
+     2.  GLOBAL UTILITIES
+  ════════════════════════════════════════════════════════════ */
+
+  /* Eyebrow label — dot + spaced caps */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .75rem;
+    font-family: var(--font-brand); font-size: .86rem; font-weight: 600;
+    letter-spacing: .25em; text-transform: uppercase;
+  }
+  .eyebrow::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; flex-shrink: 0; }
+  .eyebrow--sage  { color: var(--sage); }        .eyebrow--sage::before  { background: var(--sage); }
+  .eyebrow--gold  { color: var(--gold-d); }       .eyebrow--gold::before  { background: var(--gold-d); }
+  .eyebrow--cream { color: var(--cream); opacity:.5; } .eyebrow--cream::before { background: var(--cream); opacity:.5; }
+  .eyebrow--center { justify-content: center; }
+
+  /* Scroll-reveal */
+  .rev { opacity: 0; transform: translateY(2.6rem); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .rev.on { opacity: 1; transform: none; }
+  .d1 { transition-delay: .1s; }  .d2 { transition-delay: .22s; }
+  .d3 { transition-delay: .36s; } .d4 { transition-delay: .52s; }
+  .d5 { transition-delay: .7s; }
+
+  /* Divider */
+  .rule { width: 3.8rem; height: 1px; background: var(--gold); }
+
+  /* ════════════════════════════════════════════════════════════
+     3.  PLACEHOLDER IMAGE SYSTEM
+     ─────────────────────────────────────────────────────────
+     .img-slot wraps every image in the site.
+     When the real photo is present: the <img> fills the slot.
+     When swapping later: replace src=".../placeholder.jpg"
+     with the real asset path — layout never changes.
+     The gradient ::before is always visible underneath so
+     no image ever leaves a grey void.
+  ════════════════════════════════════════════════════════════ */
+  .img-slot {
+    position: relative; overflow: hidden;
+    background: var(--ink-3); /* base dark fallback */
+  }
+  .img-slot::before {
+    /* Warm gradient that shows through transparent / broken images */
+    content: '';
+    position: absolute; inset: 0; z-index: 0;
+    background: var(--ph-gradient, linear-gradient(160deg, var(--ph-sky) 0%, var(--ph-mountain) 30%, var(--ph-vale) 65%, var(--ph-earth) 100%));
+    transition: opacity .5s;
+  }
+  .img-slot img,
+  .img-slot video {
+    position: absolute; inset: 0; z-index: 1;
+    height: 100%; will-change: transform;
+  }
+  /* Dimming overlay applied by parent sections, sits above image */
+  .img-slot::after {
+    content: ''; position: absolute; inset: 0; z-index: 2;
+    background: var(--img-overlay, none);
+    pointer-events: none;
+  }
+
+  /* Placeholder swap label — visible during development, hidden in prod */
+  .img-slot[data-asset]::after {
+    /* keep overlay; label is on .img-label child element */
+  }
+  .img-label {
+    position: absolute; z-index: 3; bottom: 1.4rem; right: 1.4rem;
+    font-family: var(--font-brand); font-size: .75rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.28);
+    background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
+    padding: .45rem .9rem; border-radius: 10rem; pointer-events: none;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  /* Hide swap labels in production — uncomment when ready */
+  /* .img-label { display: none; } */
+
+  /* Availability badge system — driven by data-status attribute */
+  [data-status] .avail-badge { display: inline-flex; align-items: center; gap: .65rem; }
+  [data-status] .avail-badge::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; }
+  [data-status="available"]  .avail-badge { color: var(--sage);  border-color: rgba(122,148,128,.3);  background: rgba(122,148,128,.12); }
+  [data-status="available"]  .avail-badge::before { background: var(--sage); }
+  [data-status="waitlist"]   .avail-badge { color: var(--gold);  border-color: rgba(201,169,110,.26);  background: rgba(201,169,110,.1); }
+  [data-status="waitlist"]   .avail-badge::before { background: var(--gold); }
+  [data-status="confirm"]    .avail-badge { color: var(--mist);  border-color: rgba(185,178,169,.2);   background: rgba(185,178,169,.08); }
+  [data-status="confirm"]    .avail-badge::before { background: var(--mist); opacity: .5; }
+
+  /* ════════════════════════════════════════════════════════════
+     4.  CURSOR
+  ════════════════════════════════════════════════════════════ */
+  #cur {
+    position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+    width: 3.8rem; height: 3.8rem; border-radius: 50%;
+    border: 2px solid rgba(242,237,230,.88);
+    transform: translate(-50%,-50%);
+    transition: width .32s var(--snap), height .32s var(--snap), border-color .2s, background .2s;
+    background: rgba(242,237,230,.07);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 2px 12px rgba(0,0,0,.3);
+  }
+  #cur::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: .55rem; height: .55rem; border-radius: 50%;
+    background: rgba(242,237,230,.92);
+    transition: opacity .2s;
+  }
+  #cur.lg { width: 7.2rem; height: 7.2rem; border-color: rgba(242,237,230,.52); background: rgba(242,237,230,.04); }
+  #cur.lg::after { opacity: 0; }
+  @media (hover: none) { #cur { display: none; } body, a, button { cursor: auto; } }
+
+  /* ════════════════════════════════════════════════════════════
+     5.  FILM GRAIN
+  ════════════════════════════════════════════════════════════ */
+  #grain {
+    position: fixed; inset: 0; z-index: 8000; pointer-events: none; opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     5b. ENQUIRE NOW — fixed top-right CTA
+  ════════════════════════════════════════════════════════════ */
+  .top-enquire {
+    position: fixed; top: 1.8rem; right: 2.2rem; z-index: 800;
+    font-family: var(--font-brand); font-size: .88rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: .88rem 1.9rem; border-radius: 10rem;
+    background: var(--gold); color: var(--ink);
+    border: none; cursor: none;
+    box-shadow: 0 4px 22px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.25);
+    transition: background .2s, transform .18s var(--snap), box-shadow .2s;
+    display: inline-block;
+  }
+  .top-enquire:hover { background: var(--cream); transform: translateY(-.2rem); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+  @media (max-width: 640px) { .top-enquire { font-size: .78rem; padding: .75rem 1.4rem; right: 1.4rem; top: 1.4rem; } }
+
+  /* ════════════════════════════════════════════════════════════
+     6.  NAVIGATION — floating pill, bottom-centered
+  ════════════════════════════════════════════════════════════ */
+  .nav {
+    position: fixed; bottom: 2.8rem; left: 50%; transform: translateX(-50%);
+    z-index: 700;
+    display: flex; align-items: center;
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+    border-radius: 10rem;
+    box-shadow: 0 8px 48px -8px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .nav__brand {
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--cream);
+    padding: 1.2rem 1.8rem;
+    border-right: 1px solid rgba(255,255,255,.07);
+  }
+  .nav__links { display: flex; }
+  .nav__link {
+    font-family: var(--font-brand); font-size: .95rem; font-weight: 600;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--mist);
+    padding: 1.2rem 1.35rem; transition: color .2s;
+  }
+  .nav__link:hover { color: var(--cream); }
+  .nav__cta {
+    font-family: var(--font-brand); font-size: .95rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink); background: var(--cream);
+    padding: .95rem 1.8rem; margin: .38rem;
+    border-radius: 10rem; transition: background .2s, color .2s;
+  }
+  .nav__cta:hover { background: var(--gold); color: #fff; }
+
+  /* ════════════════════════════════════════════════════════════
+     7.  BUTTONS
+  ════════════════════════════════════════════════════════════ */
+  .btn {
+    display: inline-flex; align-items: center; gap: 1.2rem;
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 1.5rem 2.8rem;
+    transition: all .25s var(--snap);
+  }
+  .btn:active { transform: scale(.98); }
+  .btn svg { transition: transform .25s var(--snap); flex-shrink: 0; }
+  .btn:hover svg { transform: translate(.4rem, -.15rem); }
+  .btn--solid   { background: var(--cream); color: var(--ink); }
+  .btn--solid:hover  { background: var(--gold); color: #fff; }
+  .btn--outline { border: 1px solid rgba(255,255,255,.2); color: var(--mist); }
+  .btn--outline:hover{ border-color: rgba(255,255,255,.52); color: var(--cream); }
+  .btn--ink { background: var(--ink); color: var(--cream); border: 1px solid rgba(255,255,255,.12); }
+  .btn--ink:hover { background: var(--ink-3); border-color: rgba(255,255,255,.22); }
+
+  /* Arrow inline link */
+  .link-arrow {
+    font-family: var(--font-brand); font-size: .92rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: .8rem;
+    color: var(--cream);
+    border-bottom: 1px solid rgba(242,237,230,.22);
+    padding-bottom: .3rem; width: fit-content;
+    transition: border-color .2s, gap .22s var(--snap);
+  }
+  .link-arrow:hover { border-color: var(--cream); gap: 1.2rem; }
+  .link-arrow svg { transition: transform .22s var(--snap); }
+  .link-arrow:hover svg { transform: translateX(.3rem); }
+
+  /* ════════════════════════════════════════════════════════════
+     8.  §1  STELLENBOSCH WORLD — cinematic opening
+     ─────────────────────────────────────────────────────────
+     Height: 300vh so scroll-trigger has plenty of runway.
+     .s-world__sticky is pinned to viewport — the animation
+     happens within this sticky container as the user scrolls.
+  ════════════════════════════════════════════════════════════ */
+  .s-world { position: relative; height: 354vh; }
+  .s-world__sticky {
+    position: sticky; top: 0;
+    height: 100svh; overflow: hidden;
+  }
+
+  /* ── Landscape background slot ─────────────────────────── */
+  /*
+   * ⚡ ASSET SLOT: Stellenbosch Landscape Hero
+   * Replace the CSS gradient below with the final image:
+   *
+   *   .s-world__bg { background: none; }
+   *   /* Remove the ::before gradient and show the <img> tag instead * /
+   *
+   * Target asset:
+   *   - Wide-angle / aerial shot of Stellenbosch valley
+   *   - Helderberg or Simonsberg mountains visible
+   *   - Vineyards in foreground, town in distance
+   *   - Golden hour / warm afternoon light preferred
+   *   - Min resolution: 1920×1080 · Format: WebP
+   *   - Alternate: 6–12s drone video loop (MP4/WebM, <8MB)
+   */
+  .s-world__bg {
+    position: absolute; inset: 0;
+    /* Landscape placeholder gradient — evokes mountain/sky/vineyard at golden hour */
+    background:
+      linear-gradient(
+        170deg,
+        #1a2c3e 0%,
+        #223a4f 14%,
+        #2e4d5a 28%,   /* mountain layer */
+        #3a5c48 42%,   /* treeline */
+        #527558 52%,   /* vineyard mid */
+        #6e7e56 62%,   /* valley floor */
+        #897258 74%,   /* warm earth */
+        #b8956b 86%,   /* golden foreground */
+        #c9a97a 100%
+      );
+    will-change: transform;
+    /* Subtle animated shimmer to keep it alive before real asset */
+    animation: landscapeShimmer 14s ease-in-out infinite alternate;
+  }
+  @keyframes landscapeShimmer {
+    from { filter: brightness(1) saturate(.9); }
+    to   { filter: brightness(1.06) saturate(1.05); }
+  }
+
+  /* Cinematic overlays — stay even when real image is in */
+  .s-world__bg::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 50%, transparent 0%, rgba(11,11,10,.52) 100%),
+      linear-gradient(to bottom,
+        rgba(11,11,10,.72) 0%,
+        rgba(11,11,10,.18) 22%,
+        rgba(11,11,10,.18) 54%,
+        rgba(11,11,10,.92) 100%
+      );
+  }
+
+  /* Mountain silhouette SVG — permanent design element, removed when real photo added */
+  .s-world__silhouette {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: flex-end;
+    pointer-events: none;
+    /* Remove this element when real landscape photo is in place */
+  }
+  .s-world__silhouette svg { width: 100%; height: 55%; opacity: .18; }
+
+  /* Actual img/video element — hidden until src is provided */
+  .s-world__bg img,
+  .s-world__bg video {
+    position: absolute; inset: 0; z-index: 0;
+    height: 100%; display: none; /* show when real asset is available */
+    will-change: transform;
+  }
+  /* When real image: add class .has-asset to .s-world__bg */
+  .s-world__bg.has-asset { background: none; animation: none; }
+  .s-world__bg.has-asset img,
+  .s-world__bg.has-asset video { display: block; }
+  .s-world__bg.has-asset .s-world__silhouette { display: none; }
+
+  /* ── Content overlay ───────────────────────────────────── */
+  .s-world__content {
+    position: absolute; inset: 0; z-index: 4;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 0 4rem;
+  }
+
+  .s-world__tag {
+    font-family: var(--font-brand); font-size: .94rem; font-weight: 600;
+    letter-spacing: .3em; text-transform: uppercase; color: var(--sage);
+    margin-bottom: 4rem;
+    /* opacity/transform controlled entirely by GSAP — no CSS transition here */
+    will-change: opacity, transform;
+  }
+
+  /* TEXT LINE 1 */
+  .s-world__line1 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(4.2rem, 6.5vw, 9.5rem);
+    line-height: 1.1; letter-spacing: -.015em;
+    color: #fff; max-width: 22ch;
+    text-shadow: 0 2px 40px rgba(0,0,0,.7), 0 1px 8px rgba(0,0,0,.5);
+    will-change: opacity, transform;
+  }
+  .s-world__line1 em { font-style: italic; color: var(--gold); }
+
+  /* TEXT LINE 2 */
+  .s-world__line2 {
+    position: absolute;
+    font-family: var(--font-display); font-style: italic; font-weight: 500;
+    font-size: clamp(5.5rem, 10vw, 14rem);
+    line-height: 1.0; letter-spacing: -.025em;
+    color: #fff;
+    text-shadow: 0 2px 48px rgba(0,0,0,.75), 0 1px 10px rgba(0,0,0,.55);
+    will-change: opacity, transform; pointer-events: none;
+  }
+  .s-world__line2 strong { font-style: normal; color: var(--gold); font-weight: 600; }
+
+  /* Scroll cue */
+  .s-world__scroll {
+    position: absolute; bottom: 3.8rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 600;
+    letter-spacing: .28em; text-transform: uppercase; color: var(--smoke);
+    will-change: opacity;
+    z-index: 5;
+  }
+  .s-world__scroll-line {
+    width: 1px; height: 5rem;
+    background: linear-gradient(to bottom, var(--smoke), transparent);
+    animation: scrollPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform-origin: top; transform: scaleY(1); }
+    50%       { opacity: .2; transform-origin: top; transform: scaleY(.3); }
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     9.  §2+3  FLAGSHIP PROPERTIES — cinematic sticky transition
+     ─────────────────────────────────────────────────────────
+     480vh scroll track → two full-screen property moments.
+     Factory scales DOWN, Union rises UP from behind it.
+     JS drives: transform, opacity, border-radius per-frame.
+  ════════════════════════════════════════════════════════════ */
+  .s-flagship { position: relative; }
+  .flagship-track { position: relative; height: 618vh; }
+  .flagship-sticky {
+    position: sticky; top: 0;
+    height: 100svh; overflow: hidden;
+    background: var(--ink);
+  }
+
+  /* Both panels stacked */
+  .flagship-panel {
+    position: absolute; inset: 0; overflow: hidden;
+    will-change: transform, opacity, border-radius;
+    transform-origin: center center;
+  }
+
+  /* Panel background */
+  .flagship-panel__bg {
+    position: absolute; inset: 0;
+    /* Gradient underlayer shown if image hasn't loaded */
+    background: linear-gradient(160deg, var(--ph-sky) 0%, var(--ph-ridge) 50%, var(--ph-earth) 100%);
+  }
+  .flagship-panel__bg img,
+  .flagship-panel__bg video {
+    position: absolute; inset: 0; height: 100%;
+    filter: brightness(.7) contrast(1.06) saturate(.92);
+    will-change: transform;
+  }
+  /* Cinematic gradient scrim — stays over both image and gradient */
+  .flagship-panel__bg::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to right, rgba(11,11,10,.88) 0%, rgba(11,11,10,.52) 50%, rgba(11,11,10,.15) 100%),
+      linear-gradient(to top,   rgba(11,11,10,.88) 0%, rgba(11,11,10,.2) 52%, transparent 100%);
+  }
+
+  /* Panel content */
+  .flagship-panel__content {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 7rem 10rem;
+    max-width: 85rem;
+  }
+
+  /* Staggered reveal — triggered by .f-active class added by JS */
+  .flagship-num {
+    font-family: var(--font-brand); font-size: .86rem; font-weight: 600;
+    letter-spacing: .28em; text-transform: uppercase; color: var(--sage);
+    margin-bottom: 1.8rem;
+    opacity: 0; transform: translateY(1.8rem);
+    transition: opacity .7s var(--ease) .04s, transform .7s var(--ease) .04s;
+  }
+  .flagship-panel.f-active .flagship-num { opacity: 1; transform: none; }
+
+  /* ── Availability badge ────────────────────────────────── */
+  /*
+   * ⚡ AVAILABILITY SLOT
+   * Update the data-status attribute when confirmed:
+   *   data-status="available"  → green · "Available [year]"
+   *   data-status="waitlist"   → gold  · "Enquire for [year]"
+   *   data-status="confirm"    → mist  · "TBC — contact us"
+   */
+  .flagship-avail {
+    display: inline-flex; align-items: center; gap: .65rem;
+    font-family: var(--font-brand); font-size: .84rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: .52rem 1.25rem; border-radius: 10rem; border: 1px solid;
+    margin-bottom: 2.8rem; width: fit-content;
+    opacity: 0; transform: translateY(1.4rem);
+    transition: opacity .7s var(--ease) .12s, transform .7s var(--ease) .12s;
+  }
+  .flagship-panel.f-active .flagship-avail { opacity: 1; transform: none; }
+  .flagship-avail::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; }
+  .avail--on   { color: var(--sage); border-color: rgba(122,148,128,.3); background: rgba(122,148,128,.12); }
+  .avail--on::before { background: var(--sage); }
+  .avail--wait { color: var(--gold); border-color: rgba(201,169,110,.28); background: rgba(201,169,110,.1); }
+  .avail--wait::before { background: var(--gold); }
+  .avail--tbc  { color: var(--mist); border-color: rgba(185,178,169,.2);  background: rgba(185,178,169,.07); }
+  .avail--tbc::before  { background: var(--mist); opacity: .5; }
+
+  /* Property name — clip-path reveal */
+  .flagship-name {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(5.5rem, 10vw, 14rem);
+    line-height: .88; letter-spacing: -.02em;
+    color: #fff; margin-bottom: 2.8rem;
+    text-shadow: 0 2px 32px rgba(0,0,0,.6);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path .9s var(--snap) .18s;
+  }
+  .flagship-panel.f-active .flagship-name { clip-path: inset(0 0 0% 0); }
+
+  .flagship-identity {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(1.6rem, 2.1vw, 2.25rem); line-height: 1.68;
+    color: var(--cream); max-width: 50ch; margin-bottom: 3.5rem;
+    text-shadow: 0 1px 16px rgba(0,0,0,.55);
+    opacity: 0; transform: translateY(1.5rem);
+    transition: opacity .7s var(--ease) .3s, transform .7s var(--ease) .3s;
+  }
+  .flagship-panel.f-active .flagship-identity { opacity: 1; transform: none; }
+
+  .flagship-facts {
+    display: flex; gap: 3.5rem; margin-bottom: 4rem; flex-wrap: wrap;
+    opacity: 0; transform: translateY(1.5rem);
+    transition: opacity .7s var(--ease) .42s, transform .7s var(--ease) .42s;
+  }
+  .flagship-panel.f-active .flagship-facts { opacity: 1; transform: none; }
+  .flagship-fact { display: flex; flex-direction: column; }
+  .flagship-fact-n {
+    font-family: var(--font-brand); font-size: 2.4rem; font-weight: 800;
+    letter-spacing: -.03em; color: var(--cream); line-height: 1;
+  }
+  .flagship-fact-l {
+    font-size: 1.05rem; font-weight: 400; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--smoke); margin-top: .3rem;
+  }
+
+  .flagship-cta-wrap {
+    opacity: 0; transform: translateY(1.5rem);
+    transition: opacity .7s var(--ease) .54s, transform .7s var(--ease) .54s;
+  }
+  .flagship-panel.f-active .flagship-cta-wrap { opacity: 1; transform: none; }
+
+  /* Dot navigation */
+  .flagship-dots {
+    position: absolute; right: 4rem; top: 50%; transform: translateY(-50%);
+    z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+  }
+  .flagship-dot {
+    width: .44rem; height: .44rem; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    transition: height .3s var(--snap), border-radius .3s var(--snap), background .3s;
+  }
+  .flagship-dot.active { height: 2.8rem; border-radius: .25rem; background: var(--cream); }
+
+  /* Gold progress line */
+  .flagship-progress {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    height: 1px; background: rgba(255,255,255,.05);
+  }
+  .flagship-progress__fill { height: 100%; background: var(--gold); width: 0%; will-change: width; }
+
+  /* ════════════════════════════════════════════════════════════
+     10. §4  PATTERN BREAK — editorial pivot
+     ─────────────────────────────────────────────────────────
+     Light section. Deliberate tonal contrast after cinematic dark.
+  ════════════════════════════════════════════════════════════ */
+  .s-break {
+    background: var(--linen); color: var(--ink);
+    padding: 14rem 7rem;
+  }
+  .s-break__inner {
+    max-width: 142rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 9rem; align-items: end;
+  }
+  .s-break__ghost {
+    font-family: var(--font-brand); font-size: 11rem; font-weight: 800;
+    letter-spacing: -.07em; line-height: .82;
+    color: rgba(11,11,10,.055); margin-bottom: -1.8rem;
+    user-select: none; aria-hidden: true;
+  }
+  .s-break__h {
+    font-family: var(--font-display);
+    font-size: clamp(3.8rem, 5.5vw, 7.8rem);
+    font-weight: 500; line-height: 1.07; letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .s-break__h em { font-style: italic; color: var(--gold-d); }
+  .s-break__body {
+    font-size: 1.75rem; font-weight: 300; line-height: 1.84;
+    color: #4a4540; max-width: 52ch;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     11. §5  COLLECTION — remaining 5 properties
+     ─────────────────────────────────────────────────────────
+     Asymmetric editorial grid. NOT a standard card layout.
+     Three distinct row types for varied pacing.
+  ════════════════════════════════════════════════════════════ */
+  .s-collection {
+    background: var(--linen);
+    padding: 0 2rem 18rem;
+  }
+
+  /* Property card base */
+  .pc {
+    position: relative; overflow: hidden;
+    /* Each property gets its own warm gradient placeholder */
+    background: #c8c0b4;
+  }
+  .pc::before {
+    /* Gradient placeholder — unique per property via data-ph attribute */
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background: var(--pc-bg, linear-gradient(155deg, #2e3d30 0%, #4a5c44 45%, #7a6e55 100%));
+    transition: transform .85s var(--ease);
+  }
+  .pc img {
+    position: absolute; inset: 0; z-index: 1; height: 100%;
+    filter: brightness(.74) contrast(1.04) saturate(.9);
+    transition: transform .85s var(--ease);
+    will-change: transform;
+  }
+  .pc:hover img, .pc:hover::before { transform: scale(1.04); }
+  .pc__scrim {
+    position: absolute; inset: 0; z-index: 2;
+    background: linear-gradient(to top, rgba(11,11,10,.82) 0%, rgba(11,11,10,.18) 55%, transparent 100%);
+  }
+  .pc__content {
+    position: relative; z-index: 3; height: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 3.2rem;
+  }
+  .pc__num {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 600;
+    letter-spacing: .22em; text-transform: uppercase;
+    color: rgba(242,237,230,.45); margin-bottom: .7rem;
+  }
+  .pc__name {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3rem, 4vw, 5.5rem);
+    line-height: .92; color: var(--cream); margin-bottom: .9rem;
+  }
+  .pc__desc {
+    font-size: 1.35rem; font-weight: 300; line-height: 1.65;
+    color: rgba(242,237,230,.68); margin-bottom: 2rem; max-width: 42ch;
+  }
+
+  /* Availability badge on collection cards */
+  .pc__avail {
+    display: inline-flex; align-items: center; gap: .55rem;
+    font-family: var(--font-brand); font-size: .75rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: .4rem 1rem; border-radius: 10rem; border: 1px solid;
+    margin-bottom: 1.6rem; width: fit-content;
+  }
+  .pc__avail::before { content: ''; width: .38rem; height: .38rem; border-radius: 50%; }
+  .pc__avail.on   { color: var(--sage); border-color: rgba(122,148,128,.3); background: rgba(122,148,128,.14); }
+  .pc__avail.on::before { background: var(--sage); }
+  .pc__avail.wl   { color: var(--gold); border-color: rgba(201,169,110,.28); background: rgba(201,169,110,.1); }
+  .pc__avail.wl::before { background: var(--gold); }
+  .pc__avail.tbc  { color: var(--mist); border-color: rgba(185,178,169,.2); background: rgba(185,178,169,.07); }
+  .pc__avail.tbc::before { background: var(--mist); opacity:.5; }
+
+  /* Asymmetric layout rows */
+  .col-row1 {
+    display: grid; grid-template-columns: 1.45fr 1fr;
+    gap: 1.6rem; height: 62vh;
+  }
+  .col-row2 { margin-top: 2.4rem; height: 44vh; }
+  .col-row3 {
+    display: grid; grid-template-columns: 1fr 1.6fr;
+    gap: 1.6rem; margin-top: 2.4rem; height: 58vh;
+  }
+
+  /* Sub-reveal: content text fades in after card appears */
+  .pc .pc__content {
+    opacity: 0; transform: translateY(1.2rem);
+    transition: opacity .65s var(--ease) .32s, transform .65s var(--ease) .32s;
+  }
+  .pc.on .pc__content { opacity: 1; transform: none; }
+
+  /* Full-width banner variant */
+  .pc--banner .pc__content {
+    flex-direction: row; align-items: flex-end;
+    justify-content: space-between; gap: 3.5rem;
+  }
+  .pc--banner .pc__name {
+    font-size: clamp(3.5rem, 6vw, 8rem);
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     12. §6  LOCATION / MAP SECTION
+     ─────────────────────────────────────────────────────────
+     ⚡ MAP SLOT:
+     Replace .map-schematic with a real embed when token is ready:
+       Google Maps: <iframe src="...embed..." .../>
+       Mapbox GL JS: initialize with mapboxgl.Map({ ... })
+     Apply CSS filter: grayscale(1) brightness(.62) sepia(.18)
+     to match brand palette.
+  ════════════════════════════════════════════════════════════ */
+  .s-map {
+    background: var(--ink-2); color: var(--cream);
+    padding: 14rem 7rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .s-map__inner {
+    max-width: 156rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 9rem; align-items: start;
+  }
+  .s-map__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 5vw, 6.8rem);
+    line-height: 1.06; letter-spacing: -.01em;
+    color: var(--cream); margin: 2.4rem 0 2.8rem;
+  }
+  .s-map__h em { font-style: italic; color: var(--gold); }
+  .s-map__body {
+    font-size: 1.62rem; font-weight: 300; line-height: 1.84;
+    color: var(--mist); margin-bottom: 5.5rem; max-width: 52ch;
+  }
+
+  /* Address list */
+  .map-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline; gap: 1.5rem;
+    padding: 1.9rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+    transition: background .2s;
+  }
+  .map-item:first-child { border-top: 1px solid rgba(255,255,255,.055); }
+  .map-item__num {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--gold-d);
+    width: 2.5rem; flex-shrink: 0;
+  }
+  .map-item__name {
+    font-family: var(--font-display); font-size: 1.95rem; font-weight: 500;
+    color: var(--cream);
+  }
+  .map-item__dist {
+    font-family: var(--font-brand); font-size: .8rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--sage);
+    text-align: right; flex-shrink: 0;
+  }
+
+  /* ── Interactive Leaflet map ──────────────────────────── */
+  .map-interactive {
+    width: 100%; aspect-ratio: 4 / 3.2;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: .6rem;
+    overflow: hidden; position: relative;
+    box-shadow: 0 4px 48px -8px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
+  }
+  #gradspaceMap { width: 100%; height: 100%; }
+  /* Override Leaflet UI to match dark brand */
+  .leaflet-container { background: var(--ink-3) !important; }
+  .leaflet-tile-container img { filter: brightness(.95) saturate(1.08) contrast(1.04); }
+  .leaflet-control-zoom a {
+    background: rgba(11,11,10,.88) !important;
+    border-color: rgba(255,255,255,.12) !important;
+    color: var(--mist) !important;
+  }
+  .leaflet-control-zoom a:hover { color: var(--cream) !important; }
+  .leaflet-control-attribution {
+    background: rgba(11,11,10,.72) !important;
+    color: rgba(112,108,103,.5) !important;
+    font-family: var(--font-brand);
+    font-size: .65rem; letter-spacing: .04em;
+  }
+  .leaflet-control-attribution a { color: rgba(112,108,103,.6) !important; }
+  /* Custom tooltip styling */
+  .gs-tip {
+    background: rgba(11,11,10,.9) !important;
+    border: 1px solid rgba(255,255,255,.1) !important;
+    border-radius: .3rem !important;
+    color: var(--cream) !important;
+    font-family: var(--font-brand) !important;
+    font-size: .78rem !important; font-weight: 700 !important;
+    letter-spacing: .1em !important; text-transform: uppercase !important;
+    padding: .45rem .9rem !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6) !important;
+    white-space: nowrap;
+  }
+  .gs-tip::before { display: none !important; }
+  .gs-campus-tip {
+    background: rgba(11,11,10,.85) !important;
+    border: 1px solid rgba(122,148,128,.3) !important;
+    color: var(--sage) !important;
+    font-family: var(--font-brand) !important;
+    font-size: .75rem !important; font-weight: 700 !important;
+    letter-spacing: .1em !important; text-transform: uppercase !important;
+    padding: .4rem .85rem !important;
+  }
+  .gs-campus-tip::before { display: none !important; }
+
+  /* Property pin pulse ring */
+  @keyframes pinPulse {
+    0%   { transform: scale(1);   opacity: .55; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+  .gs-pin-pulse {
+    animation: pinPulse 2.2s ease-out infinite;
+  }
+
+  /* ── Map schematic placeholder (kept for fallback) ──── */
+  .map-schematic {
+    width: 100%;
+    aspect-ratio: 4 / 3.2;
+    background: var(--ink-3);
+    border: 1px solid rgba(255,255,255,.07);
+    position: relative; overflow: hidden;
+    display: none; /* hidden — real map replaces this */
+  }
+
+  /* Topographic line art — placeholder map texture */
+  .map-topo {
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 34px,
+        rgba(255,255,255,.022) 34px,
+        rgba(255,255,255,.022) 35px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 34px,
+        rgba(255,255,255,.012) 34px,
+        rgba(255,255,255,.012) 35px
+      );
+  }
+
+  /* Curved "roads" drawn in SVG */
+  .map-roads {
+    position: absolute; inset: 0;
+    opacity: .18;
+  }
+
+  /* Property pins */
+  .map-pin-group {
+    position: absolute; inset: 0;
+  }
+  .map-pin {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center; gap: .5rem;
+    transform: translate(-50%, -100%);
+    cursor: default;
+  }
+  .map-pin__dot {
+    width: 1.1rem; height: 1.1rem; border-radius: 50%;
+    background: var(--gold); border: 2px solid rgba(11,11,10,.6);
+    box-shadow: 0 0 0 4px rgba(201,169,110,.18), 0 2px 8px rgba(0,0,0,.5);
+    transition: transform .2s var(--snap), box-shadow .2s;
+  }
+  .map-pin:hover .map-pin__dot {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 7px rgba(201,169,110,.22), 0 2px 12px rgba(0,0,0,.6);
+  }
+  .map-pin__label {
+    font-family: var(--font-brand); font-size: .68rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--cream); white-space: nowrap;
+    background: rgba(11,11,10,.75); backdrop-filter: blur(8px);
+    padding: .3rem .7rem; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,.08);
+    opacity: 0; transform: translateY(.4rem);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  .map-pin:hover .map-pin__label { opacity: 1; transform: none; }
+
+  /* Campus marker */
+  .map-campus {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+  .map-campus__ring {
+    width: 5rem; height: 5rem; border-radius: 50%;
+    border: 1px solid rgba(122,148,128,.35);
+    background: rgba(122,148,128,.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .map-campus__dot {
+    width: 1rem; height: 1rem; border-radius: 50%;
+    background: var(--sage); opacity: .8;
+  }
+  .map-campus__label {
+    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    margin-top: .5rem;
+    font-family: var(--font-brand); font-size: .64rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--sage);
+    white-space: nowrap;
+  }
+
+  /* "Replace map" badge */
+  .map-replace-badge {
+    position: absolute; top: 1.4rem; left: 1.4rem;
+    font-family: var(--font-brand); font-size: .72rem; font-weight: 700;
+    letter-spacing: .15em; text-transform: uppercase;
+    color: rgba(255,255,255,.25); background: rgba(0,0,0,.4);
+    backdrop-filter: blur(6px);
+    padding: .45rem .9rem; border-radius: 10rem;
+    border: 1px solid rgba(255,255,255,.07);
+    pointer-events: none;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     13. §7  WHY GRADSPACE — lifestyle editorial blocks
+  ════════════════════════════════════════════════════════════ */
+  .s-why {
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .s-why__intro {
+    padding: 14rem 7rem 8rem;
+    max-width: 156rem; margin: 0 auto;
+  }
+  .s-why__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(4rem, 6vw, 8.5rem);
+    line-height: 1.02; letter-spacing: -.015em;
+    color: var(--cream); margin: 2.4rem 0 0;
+  }
+  .s-why__h em { font-style: italic; color: var(--gold); }
+
+  /* Lifestyle editorial blocks */
+  .lifestyle-block {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 72vh;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+  .lifestyle-block__image {
+    position: relative; overflow: hidden; min-height: 50rem;
+    transform-style: preserve-3d; /* lets 3D tilt render without flat clipping */
+    will-change: transform, opacity;
+  }
+  .lifestyle-img-wrap {
+    position: absolute; inset: -20% 0;
+    will-change: transform;
+  }
+  .lifestyle-img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: brightness(.68) contrast(1.1) saturate(.85);
+  }
+  .lifestyle-block__text {
+    padding: 9rem 7rem;
+    display: flex; flex-direction: column; justify-content: center;
+    background: var(--ink);
+  }
+  .lifestyle-eyebrow { margin-bottom: 2.8rem; }
+  .lifestyle-h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 4.2vw, 6rem);
+    line-height: 1.04; letter-spacing: -.01em;
+    color: var(--cream); margin-bottom: 2.8rem;
+  }
+  .lifestyle-h em { font-style: italic; color: var(--gold); }
+  .lifestyle-body {
+    font-size: 1.65rem; font-weight: 300; line-height: 1.84;
+    color: var(--mist); margin-bottom: 4rem; max-width: 46ch;
+  }
+  .lifestyle-stats { display: flex; flex-direction: column; gap: 1.6rem; }
+  .lifestyle-stat {
+    display: flex; align-items: center; gap: 1.6rem;
+    font-family: var(--font-brand); font-size: .84rem; font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+  }
+  .lifestyle-stat::before {
+    content: ''; width: 2.8rem; height: 1px;
+    background: var(--gold-d); flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .lifestyle-block { grid-template-columns: 1fr; }
+    .lifestyle-block__image { min-height: 40rem; order: -1; }
+    .lifestyle-block__text { padding: 6rem 3.5rem; }
+    .s-why__intro { padding: 10rem 3.5rem 6rem; }
+  }
+  @media (max-width: 640px) {
+    .lifestyle-block__text { padding: 5rem 2.4rem; }
+    .s-why__intro { padding: 8rem 2.4rem 5rem; }
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     14. §8  FINAL CTA
+  ════════════════════════════════════════════════════════════ */
+  .s-cta {
+    background: var(--ink-2); color: var(--cream);
+    padding: 17rem 7rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .s-cta__inner { max-width: 90rem; margin: 0 auto; }
+  .s-cta__h {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(5rem, 9vw, 13rem);
+    line-height: .95; letter-spacing: -.025em;
+    color: var(--cream); margin: 3.5rem 0 3.2rem;
+  }
+  .s-cta__h strong { font-style: normal; color: var(--gold); font-weight: 500; }
+  .s-cta__sub {
+    font-size: 1.75rem; font-weight: 300; line-height: 1.75; color: var(--mist);
+    max-width: 50ch; margin: 0 auto 5.5rem;
+  }
+  .s-cta__btns { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; }
+  .s-cta__contact {
+    margin-top: 4.8rem;
+    font-size: 1.38rem; font-weight: 300; color: var(--smoke);
+    display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+  }
+  .s-cta__contact a { color: var(--mist); border-bottom: 1px solid rgba(255,255,255,.12); transition: color .2s, border-color .2s; }
+  .s-cta__contact a:hover { color: var(--cream); border-color: rgba(255,255,255,.32); }
+
+  /* ════════════════════════════════════════════════════════════
+     15. §9  APPLICATION FORM
+     ─────────────────────────────────────────────────────────
+     ⚡ FORM SLOT: wire endpoint via data-endpoint attribute.
+     Current behavior: JS intercepts submit → console.log mock.
+     To activate: set action="" or wire fetch() to Formspree/
+     Netlify/custom API. No layout changes required.
+  ════════════════════════════════════════════════════════════ */
+  .s-apply {
+    background: var(--ink);
+    padding: 14rem 7rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .s-apply__inner { max-width: 96rem; margin: 0 auto; }
+  .s-apply__head { text-align: center; margin-bottom: 7rem; }
+  .s-apply__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(4rem, 6vw, 7.8rem);
+    line-height: 1.0; letter-spacing: -.02em;
+    color: var(--cream); margin: 2.4rem 0 1.6rem;
+  }
+  .s-apply__h em { font-style: italic; color: var(--gold); }
+  .s-apply__sub {
+    font-size: 1.65rem; font-weight: 300; line-height: 1.75; color: var(--mist);
+  }
+  .apply-form {
+    background: var(--ink-2);
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 5.5rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem;
+  }
+  .fg { display: flex; flex-direction: column; gap: .8rem; }
+  .fg--full { grid-column: span 2; }
+  label {
+    font-family: var(--font-brand); font-size: .85rem; font-weight: 600;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--sage);
+  }
+  input, select, textarea {
+    font-family: var(--font-body); font-size: 1.5rem; font-weight: 300;
+    color: var(--cream); background: var(--ink-3);
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 1.4rem 1.8rem; outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none; appearance: none;
+    border-radius: 0;
+  }
+  input:focus, select:focus, textarea:focus { border-color: rgba(201,169,110,.4); }
+  input::placeholder, textarea::placeholder { color: rgba(185,178,169,.25); }
+  select option { background: var(--ink-3); }
+  .fg--submit { grid-column: span 2; display: flex; justify-content: center; margin-top: .8rem; }
+
+  /* Form status states */
+  .form-notice {
+    grid-column: span 2;
+    font-size: 1.4rem; font-weight: 300; line-height: 1.6;
+    color: var(--sage); padding: 1.2rem 1.6rem;
+    background: rgba(122,148,128,.1); border: 1px solid rgba(122,148,128,.2);
+    display: none;
+  }
+  .form-notice.vis { display: block; }
+
+  /* ════════════════════════════════════════════════════════════
+     16. FOOTER
+  ════════════════════════════════════════════════════════════ */
+  .site-footer {
+    background: var(--ink-2);
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 4.5rem 7rem 16rem;
+  }
+  .site-footer__inner {
+    max-width: 156rem; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+  }
+  .footer-brand {
+    font-family: var(--font-brand); font-size: 1.05rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+  }
+  .footer-copy { font-size: 1.2rem; font-weight: 300; color: rgba(112,108,103,.4); }
+  .footer-links { display: flex; gap: 2.8rem; flex-wrap: wrap; }
+  .footer-link {
+    font-family: var(--font-brand); font-size: .9rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--smoke);
+    transition: color .2s;
+  }
+  .footer-link:hover { color: var(--cream); }
+  .footer-social { display: flex; gap: 1.4rem; align-items: center; }
+  .footer-social__link { color: var(--smoke); transition: color .2s; display: flex; align-items: center; }
+  .footer-social__link:hover { color: var(--cream); }
+
+  /* ════════════════════════════════════════════════════════════
+     17. RESPONSIVE
+  ════════════════════════════════════════════════════════════ */
+  @media (max-width: 1100px) {
+    html { font-size: 58%; }
+    .s-break__inner { grid-template-columns: 1fr; gap: 5rem; }
+    .s-map__inner { grid-template-columns: 1fr; gap: 6.5rem; }
+    .flagship-panel__content { padding: 0 4rem 12rem; }
+  }
+  @media (max-width: 900px) {
+    html { font-size: 54%; }
+    .flagship-panel__content { padding: 0 3.2rem 16rem; max-width: 100%; }
+    .flagship-dots { display: none; }
+    .why-grid { grid-template-columns: 1fr 1fr; }
+    .why-pillar:nth-child(3n)   { border-right: 1px solid rgba(255,255,255,.07); }
+    .why-pillar:nth-child(2n)   { border-right: none; }
+    .why-pillar:nth-child(n+4)  { border-bottom: 1px solid rgba(255,255,255,.07); }
+    .why-pillar:nth-child(5n+5), .why-pillar:nth-child(6n) { border-bottom: none; }
+    .s-break, .s-map, .s-why, .s-cta, .s-apply { padding-left: 3.5rem; padding-right: 3.5rem; }
+    .s-collection { padding-left: 1.4rem; padding-right: 1.4rem; }
+    .site-footer { padding-left: 3.5rem; padding-right: 3.5rem; }
+  }
+  /* ════════════════════════════════════════════════════════════
+     18. SERVICES & INCLUSIONS SECTION
+  ════════════════════════════════════════════════════════════ */
+  .s-services {
+    background: var(--ink-2);
+    padding: 14rem 7rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .s-services__inner { max-width: 156rem; margin: 0 auto; }
+  .s-services__head { margin-bottom: 8rem; }
+  .s-services__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 5vw, 6.8rem);
+    line-height: 1.06; letter-spacing: -.01em;
+    color: var(--cream); margin: 2.4rem 0 2.8rem;
+  }
+  .s-services__h em { font-style: italic; color: var(--gold); }
+  .s-services__sub {
+    font-size: 1.62rem; font-weight: 300; line-height: 1.84;
+    color: var(--mist); max-width: 58ch;
+  }
+
+  /* Inclusion cards */
+  .inclusions-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem; margin-bottom: 6rem;
+  }
+  .inclusion-card {
+    padding: 3.8rem 3.2rem;
+    border: 1px solid rgba(255,255,255,.065);
+    background: var(--ink);
+    transition: border-color .3s var(--ease), transform .3s var(--ease);
+    opacity: 0; /* GSAP controls visibility */
+  }
+  .inclusion-card:hover {
+    border-color: rgba(201,169,110,.24);
+    transform: translateY(-.3rem);
+  }
+  .inclusion-icon {
+    width: 3.4rem; height: 3.4rem; margin-bottom: 2.4rem;
+    color: var(--gold); display: block;
+  }
+  .inclusion-title {
+    font-family: var(--font-brand); font-size: 1.0rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--cream); margin-bottom: 1.2rem;
+  }
+  .inclusion-desc {
+    font-size: 1.42rem; font-weight: 300; line-height: 1.8;
+    color: var(--mist);
+  }
+
+  /* Lease strip */
+  .lease-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border: 1px solid rgba(255,255,255,.07);
+    background: var(--ink);
+  }
+  .lease-cell {
+    padding: 4.2rem;
+    border-right: 1px solid rgba(255,255,255,.065);
+  }
+  .lease-cell:last-child { border-right: none; }
+  .lease-cell__label {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--gold-d); margin-bottom: 1.2rem;
+  }
+  .lease-cell__val {
+    font-family: var(--font-display); font-size: 3.2rem; font-weight: 500;
+    color: var(--cream); line-height: 1.1; margin-bottom: 1.4rem;
+  }
+  .lease-cell__note {
+    font-size: 1.38rem; font-weight: 300; line-height: 1.75;
+    color: var(--smoke);
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     19. NEARBY PLACES STRIP (map section sidebar)
+  ════════════════════════════════════════════════════════════ */
+  .nearby-strip {
+    margin-top: 4rem;
+    padding-top: 3.2rem;
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+  .nearby-label {
+    font-family: var(--font-brand); font-size: .76rem; font-weight: 700;
+    letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold-d); margin-bottom: 1.8rem;
+  }
+  .nearby-tags { display: flex; flex-wrap: wrap; gap: .9rem; }
+  .nearby-tag {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 600;
+    letter-spacing: .05em;
+    color: var(--mist);
+    padding: .52rem 1.15rem;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 10rem;
+    background: rgba(255,255,255,.025);
+    transition: border-color .2s, color .2s;
+    white-space: nowrap;
+  }
+  .nearby-tag:hover { border-color: rgba(201,169,110,.2); color: var(--cream); }
+  .nearby-tag::before {
+    content: attr(data-cat) ' · ';
+    color: var(--sage); font-weight: 700;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     20. MAP LEGEND
+  ════════════════════════════════════════════════════════════ */
+  .map-legend {
+    margin-top: 1.8rem;
+    display: flex; gap: 2.4rem; flex-wrap: wrap;
+    padding: 1.6rem 2rem;
+    background: rgba(11,11,10,.6);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: .3rem;
+  }
+  .map-legend-item {
+    display: flex; align-items: center; gap: .7rem;
+    font-family: var(--font-brand); font-size: .72rem; font-weight: 600;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--smoke);
+  }
+  .map-legend-dot {
+    width: .8rem; height: .8rem; border-radius: 50%; flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(255,255,255,.08);
+  }
+
+  @media (max-width: 1100px) {
+    .inclusions-grid { grid-template-columns: repeat(2, 1fr); }
+    .lease-strip { grid-template-columns: 1fr; }
+    .lease-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,.065); }
+    .lease-cell:last-child { border-bottom: none; }
+    .s-services { padding-left: 3.5rem; padding-right: 3.5rem; }
+  }
+  @media (max-width: 900px) {
+    .s-services { padding-left: 3.5rem; padding-right: 3.5rem; }
+  }
+  @media (max-width: 640px) {
+    .inclusions-grid { grid-template-columns: 1fr; }
+    .s-services { padding-left: 2.4rem; padding-right: 2.4rem; }
+    .nearby-tags { gap: .7rem; }
+  }
+
+  @media (max-width: 640px) {
+    html { font-size: 50%; }
+    .nav { width: calc(100% - 2.4rem); justify-content: space-between; }
+    .nav__links { display: none; }
+    .flagship-panel__content { padding: 0 2.4rem 17rem; }
+    .col-row1 { grid-template-columns: 1fr; height: auto; }
+    .col-row1 > * { height: 58vw; min-height: 28rem; }
+    .col-row2 { height: 54vw; min-height: 26rem; }
+    .col-row3 { grid-template-columns: 1fr; height: auto; }
+    .col-row3 > * { height: 58vw; min-height: 28rem; }
+    .pc--banner .pc__content { flex-direction: column; gap: 1.5rem; }
+    .why-grid { grid-template-columns: 1fr; }
+    .why-pillar { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.07) !important; }
+    .why-pillar:last-child { border-bottom: none !important; }
+    .apply-form { grid-template-columns: 1fr; padding: 3.2rem 2.4rem; }
+    .fg--full, .fg--submit { grid-column: span 1; }
+    .s-cta__btns { flex-direction: column; align-items: center; }
+    .s-break, .s-map, .s-why, .s-cta, .s-apply { padding-left: 2.4rem; padding-right: 2.4rem; }
+    .s-collection { padding-left: 1rem; padding-right: 1rem; }
+    .site-footer { padding-left: 2.4rem; padding-right: 2.4rem; }
+    .site-footer__inner { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cur"></div>
+<a href="#apply" class="top-enquire">Enquire Now</a>
+
+<!-- ══════════════════════════════════════════════════════════
+     NAVIGATION — floating bottom pill
+══════════════════════════════════════════════════════════ -->
+<nav class="nav" aria-label="Main navigation">
+  <span class="nav__brand">Gradspace</span>
+  <div class="nav__links" role="list">
+    <a href="#collection" class="nav__link" role="listitem">Properties</a>
+    <a href="#services"   class="nav__link" role="listitem">Services</a>
+    <a href="#why"        class="nav__link" role="listitem">About</a>
+    <a href="#apply"      class="nav__link" role="listitem">Apply</a>
+  </div>
+  <a href="#apply" class="nav__cta">Enquire</a>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §1  STELLENBOSCH WORLD — cinematic opening
+     ────────────────────────────────────────────────────────
+     CURRENT: CSS gradient landscape + SVG mountain silhouette.
+     This section looks intentional and complete with no real assets.
+
+     ASSET SWAP — when final photograph is ready:
+     1. Add class "has-asset" to .s-world__bg
+     2. Set <img> src to the real landscape photograph
+     3. The CSS gradient and SVG silhouette auto-hide via CSS
+══════════════════════════════════════════════════════════ -->
+<section class="s-world" id="top" aria-label="Opening scene">
+  <div class="s-world__sticky">
+
+    <!-- Background: scroll-driven video -->
+    <div class="s-world__bg has-asset" id="worldBg">
+
+      <video
+        id="heroVideo"
+        src="hero.mp4"
+        muted
+        playsinline
+        preload="auto"
+        aria-hidden="true"
+      ></video>
+
+      <!-- Mountain silhouette SVG — decorative placeholder, hides with real photo -->
+      <div class="s-world__silhouette" aria-hidden="true">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Simonsberg-inspired silhouette -->
+          <path d="M0 320 L0 280 Q80 260 120 240 Q160 220 200 200 Q240 180 300 140 Q340 120 380 100 L420 80 Q440 70 460 60 L500 90 Q530 110 560 95 L600 70 Q620 55 640 45 L680 65 Q700 80 720 70 L760 50 Q780 38 800 30 L840 55 Q860 68 880 58 L920 75 Q940 85 960 78 L1000 100 Q1020 112 1040 105 L1080 125 Q1100 138 1120 130 L1160 150 Q1180 162 1200 155 L1240 170 Q1280 190 1320 210 L1360 240 Q1400 260 1440 275 L1440 320 Z" fill="white"/>
+          <!-- Foreground ridge -->
+          <path d="M0 320 L0 295 Q60 285 120 278 Q200 268 280 260 Q360 252 440 255 Q520 258 600 262 Q680 266 760 268 Q840 270 920 265 Q1000 260 1080 258 Q1160 256 1240 262 Q1320 268 1440 280 L1440 320 Z" fill="white" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Text content — scroll-driven -->
+    <div class="s-world__content">
+      <p class="s-world__tag" id="wTag">Stellenbosch · Western Cape · South Africa</p>
+
+      <!-- LINE 2: appears on scroll -->
+      <h2 class="s-world__line2" id="wLine2">
+        <strong>Gradspace.</strong><br />
+        Live better.
+      </h2>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="s-world__scroll" id="wScroll" aria-hidden="true">
+      <div class="s-world__scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §2+3  FLAGSHIP PROPERTIES — cinematic transitions
+     ────────────────────────────────────────────────────────
+     480vh scroll track. Factory scales down, Union rises.
+     JS drives transform / opacity / border-radius per-frame.
+
+     ASSET SWAP — when property photos are ready:
+     Replace <img src="...placeholder..."> with real property hero.
+     All layout, animation, and content remain unchanged.
+══════════════════════════════════════════════════════════ -->
+<section class="s-flagship" id="flagship" aria-label="Flagship properties">
+  <div class="flagship-track" id="flagshipTrack">
+    <div class="flagship-sticky" id="flagshipSticky">
+
+      <div class="flagship-progress" aria-hidden="true">
+        <div class="flagship-progress__fill" id="flagFill"></div>
+      </div>
+      <div class="flagship-dots" aria-hidden="true" id="flagDots">
+        <div class="flagship-dot active"></div>
+        <div class="flagship-dot"></div>
+      </div>
+
+      <!-- ─── Flagship 01: THE FACTORY ───────────────────── -->
+      <!--
+        AVAILABILITY SLOT: update data-status when confirmed.
+        data-status="available" | "waitlist" | "confirm"
+        Update .flagship-avail text to match.
+      -->
+      <div class="flagship-panel" id="panelFactory" data-status="available">
+        <div class="flagship-panel__bg">
+          <!--
+            ⚡ ASSET SLOT — The Factory
+            Address: 8 Soeteweide Road, Universiteits Oord, Stellenbosch 7600
+            Target: exterior architectural shot or well-lit interior.
+            NOT a standard rental listing photo. Editorial quality.
+          -->
+          <img
+            src="https://gradspace.co.za/wp-content/uploads/Gradspace-010-1080-16x9-1.jpg"
+            alt="The Factory — 8 Soeteweide Road, Stellenbosch"
+            loading="eager"
+          />
+        </div>
+        <div class="flagship-panel__content">
+          <p class="flagship-num">01 / 07 — Flagship Residence</p>
+          <span class="flagship-avail avail--on">Available 2026</span>
+          <!-- ⚡ UPDATE: swap text above when 2026 status confirmed -->
+          <h2 class="flagship-name">The Factory</h2>
+          <p class="flagship-identity">
+            4,000m² purpose-built across four storeys. Twelve apartments,
+            each designed for groups of three to six — private en-suite
+            rooms, shared living and kitchen, and a braai deck to come
+            home to.
+          </p>
+          <div class="flagship-facts">
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">12</div>
+              <div class="flagship-fact-l">Apartments</div>
+            </div>
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">3–6</div>
+              <div class="flagship-fact-l">Bedroom Plans</div>
+            </div>
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">4,000m²</div>
+              <div class="flagship-fact-l">4-Storey Block</div>
+            </div>
+          </div>
+          <div class="flagship-cta-wrap" style="display:flex;gap:1.4rem;flex-wrap:wrap;">
+            <a href="factory.html" class="btn btn--solid">
+              View Property
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#apply" class="btn btn--outline">Apply Now</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Flagship 02: UNION HOUSE ───────────────────── -->
+      <div class="flagship-panel" id="panelUnion" data-status="waitlist">
+        <div class="flagship-panel__bg" style="background: linear-gradient(155deg, #2e1e0e 0%, #4a3018 18%, #6b4822 36%, #8a6030 52%, #a07840 68%, #b89258 82%, #c8a870 100%);">
+          <!--
+            ⚡ ASSET SLOT — Union House
+            Address: 14 Soeteweide Road, Universiteits Oord, Stellenbosch 7600
+            Mood: warmer, communal feel. Lounge or outdoor social space preferred.
+          -->
+          <img
+            src="https://gradspace.co.za/wp-content/uploads/unionhouse-510-3x2-1.jpg"
+            alt="Union House — 14 Soeteweide Road, Stellenbosch"
+            loading="eager"
+            onerror="this.style.opacity='0'"
+          />
+        </div>
+        <div class="flagship-panel__content">
+          <p class="flagship-num">02 / 07 — Community Residence</p>
+          <span class="flagship-avail avail--wait">Fully Let 2025 · Enquire for 2026</span>
+          <!-- ⚡ UPDATE: swap text above when 2026 status confirmed -->
+          <h2 class="flagship-name">Union House</h2>
+          <p class="flagship-identity">
+            Two buildings. Twenty students. Uncapped Wi-Fi, a dishwasher,
+            laundry on-site, and 24-hour armed response — the kind of home
+            that makes the years unforgettable, fully supported.
+          </p>
+          <div class="flagship-facts">
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">20</div>
+              <div class="flagship-fact-l">Students · 2 Buildings</div>
+            </div>
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">En-suite</div>
+              <div class="flagship-fact-l">Most Bedrooms</div>
+            </div>
+            <div class="flagship-fact">
+              <div class="flagship-fact-n">24 hr</div>
+              <div class="flagship-fact-l">Armed Response</div>
+            </div>
+          </div>
+          <div class="flagship-cta-wrap">
+            <a href="union.html" class="btn btn--solid">
+              Explore Union House
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §4  PATTERN BREAK — editorial pivot
+     Light section. Deliberate contrast after cinematic dark.
+══════════════════════════════════════════════════════════ -->
+<section class="s-break" id="collection" aria-label="Property collection introduction">
+  <div class="s-break__inner">
+    <div>
+      <span class="eyebrow eyebrow--gold rev">The Collection</span>
+      <div class="s-break__ghost rev d1" aria-hidden="true">5</div>
+      <h2 class="s-break__h rev d2">
+        Five more<br />
+        addresses<br />
+        <em>worth knowing.</em>
+      </h2>
+    </div>
+    <div>
+      <p class="s-break__body rev d3">
+        The Factory and Union House are two of Gradspace's defining
+        addresses. But the story continues — from the private walled
+        garden of Jonkerzicht to the farm-side serenity of The
+        Vineyards. Five more places, each with its own character
+        and its own reason to be chosen.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §5  THE COLLECTION — remaining 5 properties
+     ────────────────────────────────────────────────────────
+     Asymmetric editorial layout. Three distinct row types.
+
+     ASSET SWAP — replace each <img src="..."> with final
+     property photography. Aspect ratios and layout are fixed.
+     Each card has a warm gradient placeholder underneath
+     the image layer so no slot ever appears as a grey void.
+
+     AVAILABILITY SWAP — update class on each .pc__avail:
+       .on  → Available
+       .wl  → Fully Let / Waitlist
+       .tbc → TBC — confirm with team
+══════════════════════════════════════════════════════════ -->
+<section class="s-collection" aria-label="Full property collection">
+
+  <!-- Row 1: Jonkerzicht (tall left) + Bergzicht 63 (right) -->
+  <div class="col-row1">
+
+    <!-- 03 — JONKERZICHT -->
+    <div class="pc rev" style="--pc-bg: linear-gradient(155deg,#2a3d30 0%,#3d5c42 40%,#6a7a50 75%,#8a7a55 100%)">
+      <!--
+        ⚡ ASSET SLOT — Jonkerzicht
+        116 Merriman Ave, Simonswyk — walled garden, braai terrace.
+        Target: outdoor living space or garden + covered area.
+      -->
+      <img src="https://gradspace.co.za/wp-content/uploads/Jonkerzicht-800-3x2-1.jpg" alt="Jonkerzicht — 116 Merriman Ave, Stellenbosch" loading="lazy" />
+      <div class="pc__scrim"></div>
+      <div class="pc__content">
+        <p class="pc__num">03 — Jonkerzicht · 116 Merriman Ave</p>
+        <!-- ⚡ UPDATE availability class when confirmed: on / wl / tbc -->
+        <span class="pc__avail tbc">Availability TBC 2026</span>
+        <h3 class="pc__name">Jonkerzicht</h3>
+        <p class="pc__desc">Private walled garden, covered braai terrace, and five-bedroom apartments with your own outdoor world to come home to.</p>
+        <a href="jonkerzicht.html" class="link-arrow">
+          View Property
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- 04 — BERGZICHT 63 -->
+    <div class="pc rev d1" style="--pc-bg: linear-gradient(145deg,#2a3040 0%,#3a4050 40%,#5a5860 70%,#7a7060 100%)">
+      <!--
+        ⚡ ASSET SLOT — Bergzicht 63
+        Bergzicht area, Stellenbosch — character home, quiet setting.
+      -->
+      <img src="https://gradspace.co.za/wp-content/uploads/Gradspace-Bergzicht-63-20.jpg" alt="Bergzicht 63 — Stellenbosch" loading="lazy" />
+      <div class="pc__scrim"></div>
+      <div class="pc__content">
+        <p class="pc__num">04 — Bergzicht 63</p>
+        <!-- ⚡ UPDATE availability class when confirmed -->
+        <span class="pc__avail tbc">Availability TBC 2026</span>
+        <h3 class="pc__name">Bergzicht 63</h3>
+        <p class="pc__desc">Quiet streets, architectural character, and comfort that earns its keep. A considered home in the Bergzicht quarter.</p>
+        <a href="bergzicht.html" class="link-arrow">
+          View Property
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /col-row1 -->
+
+  <!-- Row 2: Akkerhof — full-width panoramic banner -->
+  <div class="col-row2">
+    <div class="pc pc--banner rev" style="--pc-bg: linear-gradient(160deg,#2e3825 0%,#455240 38%,#6b7050 65%,#9a8860 100%); height:100%">
+      <!--
+        ⚡ ASSET SLOT — Akkerhof
+        Corner Dennesig & Bird St — central, walkable.
+        Wide shot preferred for this full-width banner row.
+      -->
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-The-Akkerhof-01-512-400x250-1.jpg"
+        alt="Akkerhof — Corner Dennesig & Bird Street, Stellenbosch"
+        loading="lazy"
+        style="object-position: center 40%"
+      />
+      <div class="pc__scrim"></div>
+      <div class="pc__content">
+        <div>
+          <p class="pc__num">05 — Akkerhof · Corner Dennesig &amp; Bird St</p>
+          <!-- ⚡ UPDATE availability class when confirmed -->
+          <span class="pc__avail tbc">Availability TBC 2026</span>
+          <h3 class="pc__name">Akkerhof</h3>
+          <p class="pc__desc" style="max-width:38ch">Communal pool, bookable sundowner deck with braai. Short walk to campus. Central, walkable, fully yours.</p>
+        </div>
+        <a href="akkerhof.html" class="link-arrow" style="flex-shrink:0;align-self:flex-end">
+          View Property
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div><!-- /col-row2 -->
+
+  <!-- Row 3: The Vineyards (left) + 24 Cluver Road (larger right) -->
+  <div class="col-row3">
+
+    <!-- 06 — THE VINEYARDS -->
+    <div class="pc rev" style="--pc-bg: linear-gradient(145deg,#2c3e25 0%,#405535 38%,#68855a 62%,#8a9a60 85%,#b8a870 100%)">
+      <!--
+        ⚡ ASSET SLOT — The Vineyards
+        Farm/nature setting, ~2.9km from Neelsie Student Centre.
+        Wide landscape preferred — vineyards, open sky, space.
+      -->
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-The-Vineyards-02.jpg"
+        alt="The Vineyards — Stellenbosch surrounds"
+        loading="lazy"
+        style="object-position: center 30%"
+      />
+      <div class="pc__scrim"></div>
+      <div class="pc__content">
+        <p class="pc__num">06 — The Vineyards · 2.9km to Neelsie</p>
+        <!-- ⚡ UPDATE availability class when confirmed -->
+        <span class="pc__avail tbc">Availability TBC 2026</span>
+        <h3 class="pc__name">The Vineyards</h3>
+        <p class="pc__desc">Farm-side serenity for the student who values space and quiet. 2.9km from the Neelsie Student Centre.</p>
+        <a href="vineyards.html" class="link-arrow">
+          View Property
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- 07 — 24 CLUVER ROAD -->
+    <div class="pc rev d1" style="--pc-bg: linear-gradient(150deg,#302a20 0%,#48402e 38%,#6a6040 65%,#9a8860 88%,#c4a870 100%)">
+      <!--
+        ⚡ ASSET SLOT — 24 Cluver Road
+        Cluver Road, central Stellenbosch — classic address, premium finishes.
+      -->
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-02-800-3x2-1.jpg"
+        alt="24 Cluver Road — Stellenbosch"
+        loading="lazy"
+      />
+      <div class="pc__scrim"></div>
+      <div class="pc__content">
+        <p class="pc__num">07 — 24 Cluver Road</p>
+        <!-- ⚡ UPDATE availability class when confirmed -->
+        <span class="pc__avail tbc">Availability TBC 2026</span>
+        <h3 class="pc__name">24 Cluver Road</h3>
+        <p class="pc__desc">One of Stellenbosch's most sought-after student addresses. A classic road, a premium residence, a community that stays.</p>
+        <a href="cluver.html" class="link-arrow">
+          View Property
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /col-row3 -->
+
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §5b  SERVICES & INCLUSIONS
+     ────────────────────────────────────────────────────────
+     What every Gradspace rental includes — services, lease
+     overview, and pricing enquiry. Info sourced from
+     gradspace.co.za.
+══════════════════════════════════════════════════════════ -->
+<section class="s-services" id="services" aria-label="Services and inclusions">
+  <div class="s-services__inner">
+
+    <div class="s-services__head">
+      <span class="eyebrow eyebrow--gold rev">What's Included</span>
+      <h2 class="s-services__h rev d1">Everything covered.<br /><em>Move in. Settle in.</em></h2>
+      <p class="s-services__sub rev d2">
+        Every Gradspace rental comes with a core set of essentials —
+        no hidden costs, no separate bills to juggle.
+        Your space, fully supported from day one.
+      </p>
+    </div>
+
+    <div class="inclusions-grid">
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">Uncapped Wi-Fi</h4>
+        <p class="inclusion-desc">Uncapped fibre internet included in your monthly rental. Study, stream, connect — no data caps, no extra charge.</p>
+      </div>
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">3× Weekly Cleaning</h4>
+        <p class="inclusion-desc">Shared areas are professionally cleaned three times per week. Your communal space stays presentable, always.</p>
+      </div>
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">Water &amp; Rates</h4>
+        <p class="inclusion-desc">Municipal water and all property rates are included. Nothing extra to budget for on top of your monthly rental.</p>
+      </div>
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">Furnished &amp; Equipped</h4>
+        <p class="inclusion-desc">Furnished lounges and kitchens. Select properties include a dishwasher, washing machine, and tumble dryer on-site. Move in ready.</p>
+      </div>
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">Prepaid Electricity</h4>
+        <p class="inclusion-desc">Electricity is prepaid per apartment — fair, transparent, and entirely in your hands. No surprise bills.</p>
+      </div>
+
+      <div class="inclusion-card">
+        <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 class="inclusion-title">On-Call Management</h4>
+        <p class="inclusion-desc">Dedicated property management for maintenance and queries. People who actually show up, reliably.</p>
+      </div>
+
+    </div><!-- /inclusions-grid -->
+
+    <!-- Lease / Pricing strip -->
+    <div class="lease-strip rev d3">
+      <div class="lease-cell">
+        <div class="lease-cell__label">Lease Period</div>
+        <div class="lease-cell__val">Jan – Dec</div>
+        <div class="lease-cell__note">Full-year lease aligned to the academic calendar. Lease runs January through December.</div>
+      </div>
+      <div class="lease-cell">
+        <div class="lease-cell__label">Payment Options</div>
+        <div class="lease-cell__val">3 or 12</div>
+        <div class="lease-cell__note">Pay in 3 equal installments or 12 monthly payments — whichever suits your budget. First payment due December 1st prior to move-in.</div>
+      </div>
+      <div class="lease-cell">
+        <div class="lease-cell__label">2026 Rates</div>
+        <div class="lease-cell__val">Enquire</div>
+        <div class="lease-cell__note">Rates vary by property and room type. A security deposit and admin fee apply. Contact us for a full 2026 breakdown.</div>
+        <a href="#apply" class="link-arrow" style="margin-top:2rem">
+          Get pricing
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §6  LOCATION / MAP SECTION
+     ────────────────────────────────────────────────────────
+     CURRENT: Designed static schematic showing all 7 properties
+     as labeled pins in approximate geographic positions relative
+     to Stellenbosch University. Hover reveals property name.
+
+     ASSET SWAP — to activate real map:
+     1. Remove .map-schematic div entirely
+     2. Add <iframe> or <div id="map"> in its place
+     3. Apply CSS filter to match brand: grayscale(1) brightness(.62) sepia(.18)
+     4. For Mapbox: initialize with mapboxgl.Map() + custom dark style
+     5. For Google: use Maps Embed API with custom style JSON
+
+     No layout changes needed — the right column slot stays the same.
+══════════════════════════════════════════════════════════ -->
+<section class="s-map" id="location" aria-label="Property locations">
+  <div class="s-map__inner">
+
+    <!-- Left: text + address list -->
+    <div>
+      <span class="eyebrow eyebrow--sage rev">Location</span>
+      <h2 class="s-map__h rev d1">
+        Built around<br />
+        <em>Stellenbosch<br />University.</em>
+      </h2>
+      <p class="s-map__body rev d2">
+        Every Gradspace address was chosen for its relationship to
+        campus. Most properties are within walking distance of the
+        main gate — the rest within easy cycling reach.
+        You are never far from where you need to be.
+      </p>
+
+      <div class="rev d3" role="list" aria-label="Property addresses and distances">
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">01</span>
+          <span class="map-item__name">The Factory</span>
+          <span class="map-item__dist">~5 min walk</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">02</span>
+          <span class="map-item__name">Union House</span>
+          <span class="map-item__dist">~5 min walk</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">03</span>
+          <span class="map-item__name">Jonkerzicht</span>
+          <span class="map-item__dist">Walking distance</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">04</span>
+          <span class="map-item__name">Bergzicht 63</span>
+          <span class="map-item__dist">Central area</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">05</span>
+          <span class="map-item__name">Akkerhof</span>
+          <span class="map-item__dist">Short walk</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">06</span>
+          <span class="map-item__name">The Vineyards</span>
+          <span class="map-item__dist">2.9 km to Neelsie</span>
+        </div>
+        <div class="map-item" role="listitem">
+          <span class="map-item__num">07</span>
+          <span class="map-item__name">24 Cluver Road</span>
+          <span class="map-item__dist">Central Stellenbosch</span>
+        </div>
+      </div>
+
+      <!-- Nearby places -->
+      <div class="nearby-strip rev d4">
+        <p class="nearby-label">Close by</p>
+        <div class="nearby-tags">
+          <span class="nearby-tag" data-cat="Coffee">Schoon The Coffee Dept</span>
+          <span class="nearby-tag" data-cat="Coffee">Knead Bakery</span>
+          <span class="nearby-tag" data-cat="Dining">Craft Wheat &amp; Hops</span>
+          <span class="nearby-tag" data-cat="Dining">Die Volkskombuis</span>
+          <span class="nearby-tag" data-cat="Retail">Die Boord Mall</span>
+          <span class="nearby-tag" data-cat="Retail">Checkers</span>
+          <span class="nearby-tag" data-cat="Retail">Woolworths Food</span>
+          <span class="nearby-tag" data-cat="Fitness">Planet Fitness</span>
+          <span class="nearby-tag" data-cat="Health">Dis-Chem Pharmacy</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Map schematic placeholder ─────────────────── -->
+    <div class="rev d2">
+      <!--
+        ⚡ MAP SLOT
+        Replace this entire .map-schematic div with:
+        - Google Maps iframe (add API key, remove all below)
+        - OR Mapbox GL JS canvas
+        Apply dark brand filter to either embed.
+      -->
+      <div class="map-interactive rev d2" role="region" aria-label="Interactive map of Gradspace property locations in Stellenbosch">
+        <div id="gradspaceMap"></div>
+      </div>
+      <div class="map-legend rev d3" aria-label="Map legend">
+        <div class="map-legend-item">
+          <div class="map-legend-dot" style="background:var(--gold)"></div>
+          <span>Gradspace Properties</span>
+        </div>
+        <div class="map-legend-item">
+          <div class="map-legend-dot" style="background:var(--sage)"></div>
+          <span>Stellenbosch University</span>
+        </div>
+        <div class="map-legend-item">
+          <div class="map-legend-dot" style="background:#d4a96e"></div>
+          <span>Coffee &amp; Dining</span>
+        </div>
+        <div class="map-legend-item">
+          <div class="map-legend-dot" style="background:#7abda4"></div>
+          <span>Retail &amp; Essentials</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §7  WHY GRADSPACE — lifestyle editorial blocks
+══════════════════════════════════════════════════════════ -->
+<section class="s-why" id="why" aria-label="Why choose Gradspace">
+
+  <div class="s-why__intro">
+    <span class="eyebrow eyebrow--sage rev">Why Gradspace</span>
+    <h2 class="s-why__h rev d1">
+      The standard of living<br /><em>you deserve.</em>
+    </h2>
+  </div>
+
+  <!-- Block 1: text left, image right -->
+  <div class="lifestyle-block">
+    <div class="lifestyle-block__text">
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">01 — Location</span>
+      <h3 class="lifestyle-h rev d1">Your campus,<br /><em>on foot.</em></h3>
+      <p class="lifestyle-body rev d2">
+        Every Gradspace address was chosen for its relationship to
+        Stellenbosch University. Most are within a five-minute walk
+        of the main gate — no transport, no planning. Just your
+        door, and then campus.
+      </p>
+      <div class="lifestyle-stats rev d3">
+        <span class="lifestyle-stat">~5 min walk to campus</span>
+        <span class="lifestyle-stat">Seven premium addresses</span>
+        <span class="lifestyle-stat">Universiteits Oord &amp; surrounds</span>
+      </div>
+    </div>
+    <div class="lifestyle-block__image" aria-hidden="true">
+      <div class="lifestyle-img-wrap">
+        <img class="lifestyle-img"
+          src="su-campus.jpg"
+          alt="Stellenbosch University campus with Simonsberg mountains"
+          loading="lazy" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Block 2: image left, text right -->
+  <div class="lifestyle-block">
+    <div class="lifestyle-block__image" aria-hidden="true">
+      <div class="lifestyle-img-wrap">
+        <img class="lifestyle-img"
+          src="home-entrance.jpg"
+          alt="Premium home entrance — modern architecture, warm light"
+          loading="lazy" />
+      </div>
+    </div>
+    <div class="lifestyle-block__text">
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">02 — Living Standard</span>
+      <h3 class="lifestyle-h rev d1">A home worth<br /><em>coming back to.</em></h3>
+      <p class="lifestyle-body rev d2">
+        Communal areas serviced three times a week. Fibre Wi-Fi
+        included. Maintenance handled by people who show up. Your
+        focus stays where it belongs — entirely on your degree.
+      </p>
+      <div class="lifestyle-stats rev d3">
+        <span class="lifestyle-stat">3× weekly communal cleaning</span>
+        <span class="lifestyle-stat">Uncapped fibre Wi-Fi included</span>
+        <span class="lifestyle-stat">24-hr armed response at select properties</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block 3: text left, image right -->
+  <div class="lifestyle-block">
+    <div class="lifestyle-block__text">
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">03 — The Town</span>
+      <h3 class="lifestyle-h rev d1">Stellenbosch<br /><em>is the reason.</em></h3>
+      <p class="lifestyle-body rev d2">
+        Wine country. Mountain backdrops. Oak-lined streets built
+        around one of Africa's great universities. You're not just
+        choosing a room — you're choosing South Africa's finest
+        student town.
+      </p>
+      <div class="lifestyle-stats rev d3">
+        <span class="lifestyle-stat">Western Cape, South Africa</span>
+        <span class="lifestyle-stat">Helderberg &amp; Simonsberg views</span>
+        <span class="lifestyle-stat">World-class wine estates</span>
+      </div>
+    </div>
+    <div class="lifestyle-block__image" aria-hidden="true">
+      <div class="lifestyle-img-wrap">
+        <img class="lifestyle-img"
+          src="town-stellenbosch.jpg"
+          alt="Stellenbosch — oak-lined streets, Cape Dutch architecture"
+          loading="lazy" />
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §8  FINAL CTA
+══════════════════════════════════════════════════════════ -->
+<section class="s-cta" aria-label="Call to action">
+  <div class="s-cta__inner">
+    <span class="eyebrow eyebrow--sage eyebrow--center rev">Applications Open</span>
+    <h2 class="s-cta__h rev d1">
+      Find your place<br />in <strong>Stellenbosch.</strong>
+    </h2>
+    <p class="s-cta__sub rev d2">
+      Browse all seven properties or get in touch —
+      we respond within one working day.
+    </p>
+    <div class="s-cta__btns rev d3">
+      <a href="#apply" class="btn btn--solid">
+        Apply Now
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="mailto:admin@gradspace.co.za" class="btn btn--outline">
+        Book a Viewing
+      </a>
+    </div>
+    <p class="s-cta__contact rev d4">
+      <a href="mailto:admin@gradspace.co.za">admin@gradspace.co.za</a>
+      <span aria-hidden="true" style="color:rgba(112,108,103,.4)">·</span>
+      <a href="tel:+27828522024">+27 82 852 2024</a>
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §9  APPLICATION FORM
+     ────────────────────────────────────────────────────────
+     ⚡ FORM ENDPOINT SLOT
+     Current: JS intercepts submit → console.log mock + UI feedback.
+     No layout changes needed to activate real endpoint.
+
+     To wire a real endpoint, choose ONE of:
+
+     A) Formspree (no backend required):
+        <form ... data-endpoint="https://formspree.io/f/YOUR_ID">
+        In JS: fetch(form.dataset.endpoint, { method:'POST', body:formData })
+
+     B) Netlify Forms (add netlify attribute to <form>):
+        <form netlify name="gradspace-enquiry" ...>
+        Remove the JS submit handler — Netlify handles it natively.
+
+     C) Custom API (POST to your own endpoint):
+        Set data-endpoint to your API URL.
+        The JS fetch() call in handleSubmit() already reads this attribute.
+══════════════════════════════════════════════════════════ -->
+<section class="s-apply" id="apply" aria-label="Application form">
+  <div class="s-apply__inner">
+    <div class="s-apply__head">
+      <span class="eyebrow eyebrow--sage eyebrow--center rev">Start Here</span>
+      <h2 class="s-apply__h rev d1">Begin your<br /><em>application.</em></h2>
+      <p class="s-apply__sub rev d2">
+        Tell us which property interests you and we'll be in touch within 24 hours.
+      </p>
+    </div>
+
+    <form
+      class="apply-form rev d3"
+      id="applyForm"
+      novalidate
+      data-endpoint="https://formsubmit.co/ajax/admin@gradspace.co.za"
+    >
+      <div class="fg">
+        <label for="fn">First Name</label>
+        <input type="text" id="fn" name="first_name" placeholder="Your first name" required autocomplete="given-name" />
+      </div>
+      <div class="fg">
+        <label for="ln">Last Name</label>
+        <input type="text" id="ln" name="last_name" placeholder="Your last name" required autocomplete="family-name" />
+      </div>
+      <div class="fg">
+        <label for="em">Email Address</label>
+        <input type="email" id="em" name="email" placeholder="you@sun.ac.za" required autocomplete="email" />
+      </div>
+      <div class="fg">
+        <label for="ph">Phone Number</label>
+        <input type="tel" id="ph" name="phone" placeholder="+27 82 123 4567" autocomplete="tel" />
+      </div>
+      <div class="fg">
+        <label for="prop">Preferred Property</label>
+        <select id="prop" name="property">
+          <option value="">Select a property</option>
+          <option value="the-factory">The Factory — 8 Soeteweide Road</option>
+          <option value="union-house">Union House — 14 Soeteweide Road</option>
+          <option value="jonkerzicht">Jonkerzicht — 116 Merriman Ave</option>
+          <option value="bergzicht-63">Bergzicht 63</option>
+          <option value="akkerhof">Akkerhof — Dennesig &amp; Bird St</option>
+          <option value="the-vineyards">The Vineyards</option>
+          <option value="24-cluver-road">24 Cluver Road</option>
+          <option value="no-preference">No preference — show me all options</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label for="yr">Academic Year</label>
+        <select id="yr" name="academic_year">
+          <option value="">Select year</option>
+          <option value="1st">1st Year</option>
+          <option value="2nd">2nd Year</option>
+          <option value="3rd">3rd Year</option>
+          <option value="postgrad">Postgraduate</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg fg--full">
+        <label for="msg">Anything else?</label>
+        <input
+          type="text" id="msg" name="message"
+          placeholder="Group size, move-in date, specific requirements, questions..."
+        />
+      </div>
+
+      <!-- FormSubmit.co config fields — required for AJAX delivery -->
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_subject" value="New Gradspace Enquiry" />
+      <input type="hidden" name="_template" value="table" />
+
+      <!-- Success / error notice -->
+      <div class="form-notice" id="formNotice" role="status" aria-live="polite"></div>
+
+      <div class="fg--submit">
+        <button type="submit" class="btn btn--solid" id="submitBtn" style="padding:1.8rem 5rem;font-size:1.2rem">
+          Submit Enquiry
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </form>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span class="footer-brand">Gradspace SA</span>
+    <span class="footer-copy">&copy; 2025 Gradspace SA &middot; Student Housing in Stellenbosch</span>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="https://gradspace.co.za/our-houses/" class="footer-link" target="_blank" rel="noopener">All Properties</a>
+      <a href="#apply"                               class="footer-link">Apply</a>
+      <a href="https://gradspace.co.za/fault-report/" class="footer-link" target="_blank" rel="noopener">Tenant Portal</a>
+      <a href="https://gradspace.co.za/marketplace/"  class="footer-link" target="_blank" rel="noopener">Marketplace</a>
+      <a href="https://gradspace.co.za/wp-content/uploads/Gradspace-House-Rules.pdf" class="footer-link" target="_blank" rel="noopener">House Rules</a>
+      <a href="mailto:admin@gradspace.co.za"          class="footer-link">Contact</a>
+    </nav>
+    <div class="footer-social" aria-label="Social media links">
+      <a href="https://www.facebook.com/people/Gradspace-Student-Housing/100054298579042/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/grad.space/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── 0. Scroll position — two-key handshake ──────────────────
+ *
+ * gs_back_intent is set ONLY in the click handler below, the
+ * instant before navigating to a property page.  It cannot
+ * survive a refresh (the click handler never runs on reload),
+ * so its presence is proof this is a genuine back-navigation.
+ *
+ * Refresh / fresh visit → gs_back_intent absent → always top.
+ * Back from property    → both keys present     → restore Y.
+ */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+const _backIntent  = sessionStorage.getItem('gs_back_intent');
+const _savedScroll = _backIntent ? sessionStorage.getItem('gs_scroll_y') : null;
+sessionStorage.removeItem('gs_back_intent');
+sessionStorage.removeItem('gs_scroll_y');
+
+/* ── 1. Custom cursor ─────────────────────────────────────── */
+const cur = document.getElementById('cur');
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function cursorTick() {
+  cx += (mx - cx) * .13;
+  cy += (my - cy) * .13;
+  cur.style.left = cx + 'px';
+  cur.style.top  = cy + 'px';
+  requestAnimationFrame(cursorTick);
+})();
+document.querySelectorAll('a, button, .flagship-panel, .pc, .map-pin, .top-enquire').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('lg'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('lg'));
+});
+
+/* ── 2. World section: text reveals — GSAP owns all opacity/transform ──
+ *
+ * CSS has NO opacity/transition on these elements.
+ * GSAP controls them exclusively to avoid any conflict.
+ */
+const wTag    = document.getElementById('wTag');
+const wLine2  = document.getElementById('wLine2');
+const wScroll = document.getElementById('wScroll');
+
+// Set hidden states immediately (before paint) so no flash
+gsap.set([wTag, wLine2, wScroll], { opacity: 0 });
+gsap.set(wTag, { y: 26 });
+gsap.set(wLine2, { y: 32 });
+
+// On load: only scroll cue appears — wTag reveals on scroll
+window.addEventListener('load', () => {
+  gsap.to(wScroll, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 1.5 });
+});
+
+/* ── 3. World section: video autoplay + scroll text swap ─────
+ *
+ * Performance approach:
+ *  - Video plays normally (autoplay loop) — no scroll scrubbing
+ *    which caused severe jank on every scroll event
+ *  - Text phases use GSAP ScrollTrigger scrub for GPU-composited
+ *    opacity/transform — no inline style thrashing
+ *  - Background zoom uses a single CSS custom property updated
+ *    once per rAF frame, applied via transform on a dedicated layer
+ */
+const worldSection = document.querySelector('.s-world');
+const worldBg      = document.getElementById('worldBg');
+const heroVideo    = document.getElementById('heroVideo');
+
+// Let the video play normally — much smoother than scroll-scrubbing
+heroVideo.muted = true;
+heroVideo.loop  = false;  // play once only
+heroVideo.play().catch(() => {});
+
+/* ── 4. Background zoom — GPU-only, one rAF per frame ──────── */
+let rafPending = false;
+let lastP = 0;
+
+window.addEventListener('scroll', () => {
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => {
+    const totalH = worldSection.offsetHeight - window.innerHeight;
+    const p = Math.max(0, Math.min(1, window.scrollY / Math.max(1, totalH)));
+    lastP = p;
+
+    // GPU-composited zoom — only touches transform (no layout, no paint)
+    worldBg.style.transform = `translateZ(0) scale(${1 + p * 0.08})`;
+
+    // Scroll cue visibility
+    wScroll.style.opacity = p > 0.04 ? '0' : '';
+
+    rafPending = false;
+  });
+}, { passive: true });
+
+// Initialise
+worldBg.style.transform = 'translateZ(0) scale(1)';
+
+/* ── 5. GSAP: World text phases — scroll-driven ─────────────
+ *
+ * Uses ScrollTrigger scrub so all transforms are GPU-composited
+ * and perfectly sync'd to scroll position with no JS per-frame work.
+ */
+gsap.registerPlugin(ScrollTrigger);
+
+// Tag: fades in on first scroll, before the main headline
+gsap.fromTo(wTag,
+  { opacity: 0, y: 26 },
+  {
+    opacity: 1, y: 0,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.s-world',
+      start: '14% top',
+      end: '30% top',
+      scrub: 0.5
+    }
+  }
+);
+
+// Line 2: fades in deeper into scroll — "Gradspace. Live better."
+gsap.fromTo(wLine2,
+  { opacity: 0, y: 32 },
+  {
+    opacity: 1, y: 0,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.s-world',
+      start: '42% top',
+      end: '60% top',
+      scrub: 0.5
+    }
+  }
+);
+
+/* ── 6. GSAP: Flagship cinematic animation ───────────────── */
+
+const panelFactory = document.getElementById('panelFactory');
+const panelUnion   = document.getElementById('panelUnion');
+const flagFill     = document.getElementById('flagFill');
+const flagDots     = document.querySelectorAll('.flagship-dot');
+
+// Set initial states via GSAP — avoids inline style conflicts
+gsap.set('#panelFactory', { scale: 0.68, borderRadius: '3rem', transformOrigin: 'center center', opacity: 1, force3D: true });
+gsap.set('#panelUnion',   { xPercent: 100, scale: 1.06, opacity: 0, force3D: true });
+
+// Scroll progress thresholds (based on relative durations below):
+// Phase 1 (0–15%):  Factory zooms in from pill
+// Phase 2 (15–42%): Factory holds — content reads
+// Phase 3 (42–57%): Factory shrinks + slides out; Union slides + zooms in
+// Phase 4 (57–81%): Union holds — content reads
+// Phase 5 (81–100%): Union shrinks into screen → collection section
+const FACTORY_ACTIVE_END  = 0.42;
+const UNION_ACTIVE_START  = 0.58;
+const UNION_SHRINK_START  = 0.80;
+const DOT_SWITCH          = 0.54;
+
+const flagTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: '#flagshipTrack',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 1.2,
+    onUpdate(self) {
+      const p = self.progress;
+
+      flagFill.style.width = (p * 100) + '%';
+      flagDots.forEach((d, i) => d.classList.toggle('active', i === (p > DOT_SWITCH ? 1 : 0)));
+
+      if (p < 0.12) {
+        panelFactory.classList.remove('f-active');
+        panelUnion.classList.remove('f-active');
+      } else if (p < FACTORY_ACTIVE_END) {
+        panelFactory.classList.add('f-active');
+        panelUnion.classList.remove('f-active');
+      } else if (p > UNION_ACTIVE_START && p < UNION_SHRINK_START) {
+        panelFactory.classList.remove('f-active');
+        panelUnion.classList.add('f-active');
+      } else {
+        panelFactory.classList.remove('f-active');
+        panelUnion.classList.remove('f-active');
+      }
+    }
+  }
+});
+
+flagTl
+  // Phase 1: Factory pill → full-screen dramatic zoom  (1.0 × 1.3 = 1.3)
+  .to('#panelFactory', {
+    scale: 1, borderRadius: '0rem', opacity: 1,
+    ease: 'none', duration: 1.3
+  })
+  // Phase 2: Factory holds  (1.8 × 1.3 = 2.34)
+  .to('#panelFactory', { ease: 'none', duration: 2.34 })
+  // Phase 3: Factory exits + Union enters  (1.0 × 1.3 = 1.3 each)
+  .to('#panelFactory', {
+    xPercent: -108, scale: 0.84, opacity: 0,
+    ease: 'none', duration: 1.3
+  })
+  .to('#panelUnion', {
+    xPercent: 0, scale: 1, opacity: 1,
+    ease: 'none', duration: 1.3
+  }, '<')
+  // Phase 4: Union holds  (1.7 × 1.3 = 2.21)
+  .to('#panelUnion', { ease: 'none', duration: 2.21 })
+  // Phase 5: Union shrinks into screen — zooms to vanishing point  (1.3 × 1.3 = 1.69)
+  .to('#panelUnion', {
+    scale: 0.06,
+    opacity: 0,
+    borderRadius: '50%',
+    ease: 'power2.in',
+    duration: 1.69
+  });
+
+/* ── 6. Lifestyle: 3D entrance → 2D + parallax + slow drift ─
+ *
+ * Three layered effects on separate elements — no conflicts:
+ *   .lifestyle-block__image  → 3D tilt flattens as block enters view
+ *   .lifestyle-img-wrap       → vertical parallax scrub (scroll-driven)
+ *   .lifestyle-img            → slow continuous idle drift (alive feel)
+ */
+gsap.utils.toArray('.lifestyle-block').forEach((block, i) => {
+  const imgBox = block.querySelector('.lifestyle-block__image');
+  const wrap   = block.querySelector('.lifestyle-img-wrap');
+  const img    = block.querySelector('.lifestyle-img');
+  if (!imgBox || !wrap || !img) return;
+
+  // Layer 1: vertical parallax — image travels beyond container so no edge gaps
+  gsap.fromTo(wrap,
+    { yPercent: -14 },
+    { yPercent: 14, ease: 'none',
+      scrollTrigger: { trigger: block, start: 'top bottom', end: 'bottom top', scrub: true }
+    }
+  );
+
+  // Layer 2: 3D → 2D reveal
+  // Odd blocks tilt left (positive rotationY), even blocks tilt right (negative)
+  // rotationX adds a subtle forward-lean that flattens as the block enters
+  const dir = i % 2 === 0 ? -1 : 1;
+  gsap.fromTo(imgBox,
+    {
+      transformPerspective: 1100,
+      rotationY: dir * 20,
+      rotationX: 12,
+      scale: 1.08,
+      opacity: 0.55
+    },
+    {
+      rotationY: 0,
+      rotationX: 0,
+      scale: 1,
+      opacity: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: block,
+        start: 'top 90%',
+        end: 'top 8%',
+        scrub: 1.6
+      }
+    }
+  );
+
+  // Layer 3: continuous slow drift — makes the image feel alive
+  // Each block drifts in a slightly different direction and speed
+  const driftX = dir * 13;
+  const driftY = i % 2 === 0 ? -9 : 7;
+  gsap.to(img, {
+    x: driftX,
+    y: driftY,
+    duration: 6 + i * 1.8,
+    ease: 'sine.inOut',
+    repeat: -1,
+    yoyo: true,
+    delay: i * 1.5
+  });
+});
+
+/* ── 7. IntersectionObserver scroll-reveal ───────────────── */
+const revIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('on');
+      revIO.unobserve(e.target);
+    }
+  });
+}, { threshold: .06, rootMargin: '0px 0px -3% 0px' });
+document.querySelectorAll('.rev').forEach(el => revIO.observe(el));
+
+/* ── 8. Leaflet interactive map ──────────────────────────── */
+(function initMap() {
+  const mapEl = document.getElementById('gradspaceMap');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  const map = L.map('gradspaceMap', {
+    center: [-33.932, 18.864],
+    zoom: 14,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    attributionControl: true
+  });
+
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  // ESRI World Imagery — free satellite tiles, no API key required
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
+    maxZoom: 19
+  }).addTo(map);
+  // Street labels overlay on top of satellite
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '',
+    maxZoom: 19,
+    opacity: 0.68
+  }).addTo(map);
+
+  // Gold property marker — large with pulsing ring
+  function makePin(color) {
+    return L.divIcon({
+      html: `<div style="position:relative;width:20px;height:20px;">
+        <div class="gs-pin-pulse" style="position:absolute;inset:-4px;border-radius:50%;background:${color};opacity:.4;"></div>
+        <div style="position:relative;z-index:1;width:20px;height:20px;border-radius:50%;background:${color};border:2.5px solid rgba(11,11,10,.85);box-shadow:0 0 0 4px rgba(201,169,110,.22),0 3px 12px rgba(0,0,0,.75);"></div>
+      </div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+  }
+
+  const properties = [
+    { num: '01', name: 'The Factory',    coords: [-33.9278, 18.8598], href: 'factory.html' },
+    { num: '02', name: 'Union House',    coords: [-33.9273, 18.8605], href: 'https://gradspace.co.za/unit/union-house/' },
+    { num: '03', name: 'Jonkerzicht',    coords: [-33.9366, 18.8672], href: 'jonkerzicht.html' },
+    { num: '04', name: 'Bergzicht 63',   coords: [-33.9330, 18.8555], href: 'bergzicht.html' },
+    { num: '05', name: 'Akkerhof',       coords: [-33.9352, 18.8688], href: 'akkerhof.html' },
+    { num: '06', name: 'The Vineyards',  coords: [-33.9015, 18.8745], href: 'vineyards.html' },
+    { num: '07', name: '24 Cluver Road', coords: [-33.9385, 18.8625], href: 'cluver.html' },
+  ];
+
+  properties.forEach(({ num, name, coords, href }) => {
+    L.marker(coords, { icon: makePin('#c9a96e') })
+      .addTo(map)
+      .bindTooltip(`${num} &middot; ${name}`, {
+        permanent: false, direction: 'top',
+        offset: [0, -10], className: 'gs-tip'
+      })
+      .on('click', () => { window.location.href = href; });
+  });
+
+  // Nearby amenities — smaller markers, muted teal/sage
+  function makePOI(color) {
+    return L.divIcon({
+      html: `<div style="width:9px;height:9px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,.5);box-shadow:0 1px 6px rgba(0,0,0,.5);"></div>`,
+      className: '',
+      iconSize: [9, 9],
+      iconAnchor: [4.5, 4.5]
+    });
+  }
+
+  const poiCategories = {
+    coffee:  '#d4a96e',
+    dining:  '#b87e52',
+    retail:  '#7abda4',
+    fitness: '#8aaac4',
+    essentials: '#9ab48a'
+  };
+
+  const nearbyPOI = [
+    { name: 'Schoon · Coffee', coords: [-33.9340, 18.8672], cat: 'coffee' },
+    { name: 'Knead Bakery · Café', coords: [-33.9358, 18.8656], cat: 'coffee' },
+    { name: 'Craft Wheat & Hops · Dining', coords: [-33.9346, 18.8685], cat: 'dining' },
+    { name: 'Die Volkskombuis · Dining', coords: [-33.9332, 18.8660], cat: 'dining' },
+    { name: 'Die Boord Shopping Centre · Retail', coords: [-33.9435, 18.8538], cat: 'retail' },
+    { name: 'Checkers Stellenbosch · Grocery', coords: [-33.9410, 18.8555], cat: 'retail' },
+    { name: 'Woolworths Food · Grocery', coords: [-33.9392, 18.8608], cat: 'retail' },
+    { name: 'Planet Fitness Stellenbosch · Gym', coords: [-33.9445, 18.8568], cat: 'fitness' },
+    { name: 'Dis-Chem · Pharmacy', coords: [-33.9388, 18.8595], cat: 'essentials' },
+    { name: 'Spar Stellenbosch · Grocery', coords: [-33.9368, 18.8618], cat: 'retail' },
+  ];
+
+  nearbyPOI.forEach(({ name, coords, cat }) => {
+    L.marker(coords, { icon: makePOI(poiCategories[cat]) })
+      .addTo(map)
+      .bindTooltip(name, {
+        permanent: false, direction: 'top',
+        offset: [0, -8], className: 'gs-tip'
+      });
+  });
+
+  // University marker
+  L.marker([-33.9328, 18.8645], {
+    icon: L.divIcon({
+      html: `<div style="width:26px;height:26px;border-radius:50%;background:rgba(122,148,128,.2);border:2px solid #7a9480;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(122,148,128,.12),0 2px 10px rgba(0,0,0,.6);"><div style="width:10px;height:10px;border-radius:50%;background:#7a9480;"></div></div>`,
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
+    })
+  }).addTo(map)
+    .bindTooltip('Stellenbosch University', {
+      permanent: true, direction: 'right',
+      offset: [12, 0], className: 'gs-campus-tip'
+    });
+})();
+
+/* ── 9. Inclusion cards — stagger slide-in on scroll ─────── */
+(function() {
+  const incCards = gsap.utils.toArray('.inclusion-card');
+  if (!incCards.length) return;
+
+  // Per-column initial state: left col from left, center from below, right from right
+  incCards.forEach((card, i) => {
+    const col = i % 3;
+    gsap.set(card, {
+      opacity: 0,
+      x: col === 0 ? -55 : col === 2 ? 55 : 0,
+      y: col === 1 ? 45 : 22
+    });
+  });
+
+  ScrollTrigger.create({
+    trigger: '.inclusions-grid',
+    start: 'top 78%',
+    onEnter() {
+      gsap.to(incCards, {
+        opacity: 1, x: 0, y: 0,
+        duration: 0.88,
+        ease: 'power3.out',
+        stagger: { amount: 0.58, from: 'start' }
+      });
+    }
+  });
+})();
+
+/* ── 10. Smooth anchor scroll ────────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ── 11. Form submission handler ────────────────────────────
+ *
+ * ⚡ ENDPOINT SWAP INSTRUCTIONS:
+ *
+ * A) Formspree:
+ *    Set data-endpoint="https://formspree.io/f/YOUR_FORM_ID" on <form>
+ *    The fetch() below picks it up automatically.
+ *
+ * B) Netlify:
+ *    Add attribute netlify to <form> + name="gradspace-enquiry"
+ *    Remove this entire handleSubmit function — Netlify handles it.
+ *
+ * C) Custom API:
+ *    Set data-endpoint to your POST endpoint.
+ *    Add any auth headers in the fetch() options below.
+ *
+ * D) Mock / console (current — default if data-endpoint is empty):
+ *    Logs form data to console. No server required.
+ *    Useful for design review and layout testing.
+────────────────────────────────────────────────────────── */
+const applyForm  = document.getElementById('applyForm');
+const submitBtn  = document.getElementById('submitBtn');
+const formNotice = document.getElementById('formNotice');
+
+applyForm.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  // Basic client-side validation
+  if (!applyForm.checkValidity()) {
+    applyForm.reportValidity();
+    return;
+  }
+
+  const endpoint = applyForm.dataset.endpoint || '';
+  const formData = new FormData(applyForm);
+  const payload  = Object.fromEntries(formData.entries());
+
+  // Loading state
+  const origHTML = submitBtn.innerHTML;
+  submitBtn.textContent = 'Sending…';
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = '.6';
+
+  try {
+    if (endpoint) {
+      // ── Real endpoint path ────────────────────────────────
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      showNotice('success', "Thank you — we'll be in touch within 24 hours.");
+      applyForm.reset();
+
+    } else {
+      // ── Mock path (no endpoint set) ───────────────────────
+      console.log('[Gradspace Enquiry — MOCK] Form data:', payload);
+      console.log('[Gradspace Enquiry] Set data-endpoint on <form> to wire a real handler.');
+      await mockDelay(900); // simulate network latency
+      showNotice('success', "We've received your enquiry and will be in touch within 24 hours.");
+      applyForm.reset();
+    }
+
+  } catch (err) {
+    console.error('[Gradspace Form Error]', err);
+    showNotice('error', 'Something went wrong. Please email us directly at admin@gradspace.co.za');
+  } finally {
+    submitBtn.innerHTML  = origHTML;
+    submitBtn.disabled   = false;
+    submitBtn.style.opacity = '';
+  }
+});
+
+function showNotice(type, message) {
+  formNotice.textContent = message;
+  formNotice.style.display = 'block';
+  formNotice.style.color   = type === 'success' ? 'var(--sage)' : '#c47a7a';
+  formNotice.style.background   = type === 'success' ? 'rgba(122,148,128,.1)' : 'rgba(196,122,122,.08)';
+  formNotice.style.borderColor  = type === 'success' ? 'rgba(122,148,128,.22)' : 'rgba(196,122,122,.2)';
+  setTimeout(() => { formNotice.style.display = 'none'; }, 9000);
+}
+
+function mockDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+/* ── 10. Save scroll position when navigating to a property page ──
+ *
+ * Any internal .html link (factory.html, union.html, etc.) saves the
+ * current scrollY to sessionStorage before the browser navigates away.
+ * On return, the value is read at the top of this script and restored
+ * below (after GSAP + ScrollTrigger are fully initialised).
+ */
+// Save scroll + signal intent only when deliberately navigating to a property page
+document.querySelectorAll('a[href$=".html"]:not([href^="http"])').forEach(a => {
+  a.addEventListener('click', () => {
+    sessionStorage.setItem('gs_back_intent', '1');
+    sessionStorage.setItem('gs_scroll_y', Math.round(window.scrollY));
+  });
+});
+
+// Restore position now that all GSAP animations + ScrollTriggers are ready
+if (_savedScroll !== null) {
+  const targetY = parseInt(_savedScroll, 10);
+  window.scrollTo(0, targetY);
+  ScrollTrigger.refresh();
+}
+
+/* ── 11. Prefers-reduced-motion: show everything immediately ── */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('.rev').forEach(el => {
+    el.style.transition = 'none';
+    el.classList.add('on');
+  });
+  gsap.set([wTag, wScroll], { opacity: 1, y: 0 });
+  gsap.set(wLine2, { opacity: 1, y: 0 });
+}
+</script>
+</body>
+</html>

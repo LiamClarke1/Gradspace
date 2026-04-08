@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jonkerzicht — Gradspace Student Housing, Stellenbosch</title>
+  <meta name="description" content="Jonkerzicht by Gradspace. Private walled garden and covered braai terrace at 116 Merriman Avenue, Simonswyk. Five-bedroom apartments for students who value outdoor living." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+
+  /* ── Design tokens ────────────────────────────────────────── */
+  :root {
+    --ink:      #0b0b0a;
+    --ink-2:    #131312;
+    --ink-3:    #1c1b1a;
+    --cream:    #f2ede6;
+    --mist:     #b9b2a9;
+    --smoke:    #706c67;
+    --gold:     #c9a96e;
+    --gold-d:   #9e7d46;
+    --sage:     #7a9480;
+    --linen:    #f0ebe2;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --snap: cubic-bezier(0.16, 1, 0.3, 1);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-brand:   'Syne', sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+  }
+
+  /* ── Reset ────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 62.5%; -webkit-font-smoothing: antialiased; scroll-behavior: auto; }
+  body { background: var(--ink); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  ul { list-style: none; }
+  button { cursor: none; font: inherit; background: none; border: none; }
+
+  /* ── Utilities ────────────────────────────────────────────── */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .75rem;
+    font-family: var(--font-brand); font-size: .86rem; font-weight: 600;
+    letter-spacing: .25em; text-transform: uppercase;
+  }
+  .eyebrow::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; flex-shrink: 0; }
+  .eyebrow--sage  { color: var(--sage); }   .eyebrow--sage::before  { background: var(--sage); }
+  .eyebrow--gold  { color: var(--gold-d); } .eyebrow--gold::before  { background: var(--gold-d); }
+  .rev { opacity: 0; transform: translateY(2.4rem); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .rev.on { opacity: 1; transform: none; }
+  .d1 { transition-delay: .12s; } .d2 { transition-delay: .26s; }
+  .d3 { transition-delay: .42s; } .d4 { transition-delay: .58s; }
+
+  /* ── Cursor ───────────────────────────────────────────────── */
+  #cur {
+    position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+    width: 3.4rem; height: 3.4rem; border-radius: 50%;
+    border: 1px solid rgba(242,237,230,.24);
+    transform: translate(-50%,-50%);
+    transition: width .32s var(--snap), height .32s var(--snap);
+    mix-blend-mode: difference;
+  }
+  #cur.lg { width: 7.2rem; height: 7.2rem; border-color: rgba(242,237,230,.1); }
+  @media (hover: none) { #cur { display: none; } body, a, button { cursor: auto; } }
+
+  /* ── Film grain ───────────────────────────────────────────── */
+  #grain {
+    position: fixed; inset: 0; z-index: 8000; pointer-events: none; opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Nav ──────────────────────────────────────────────────── */
+  .nav {
+    position: fixed; bottom: 2.8rem; left: 50%; transform: translateX(-50%);
+    z-index: 700;
+    display: flex; align-items: center;
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+    border-radius: 10rem;
+    box-shadow: 0 8px 48px -8px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .nav__back {
+    font-family: var(--font-brand); font-size: .9rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--mist);
+    padding: 1.2rem 1.6rem;
+    border-right: 1px solid rgba(255,255,255,.07);
+    transition: color .2s;
+    display: flex; align-items: center; gap: .7rem;
+  }
+  .nav__back:hover { color: var(--cream); }
+  .nav__brand {
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--cream);
+    padding: 1.2rem 1.8rem;
+  }
+  .nav__cta {
+    font-family: var(--font-brand); font-size: .95rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink); background: var(--cream);
+    padding: .95rem 1.8rem; margin: .38rem;
+    border-radius: 10rem; transition: background .2s, color .2s;
+  }
+  .nav__cta:hover { background: var(--gold); color: #fff; }
+
+  /* ── Buttons ──────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 1.2rem;
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 1.5rem 2.8rem;
+    transition: all .25s var(--snap);
+  }
+  .btn:active { transform: scale(.98); }
+  .btn--solid   { background: var(--cream); color: var(--ink); }
+  .btn--solid:hover  { background: var(--gold); color: #fff; }
+  .btn--outline { border: 1px solid rgba(255,255,255,.2); color: var(--mist); }
+  .btn--outline:hover { border-color: rgba(255,255,255,.52); color: var(--cream); }
+
+  /* ══════════════════════════════════════════════════════════
+     HERO
+  ══════════════════════════════════════════════════════════ */
+  .fp-hero {
+    position: relative; height: 100svh; overflow: hidden;
+  }
+  .fp-hero__bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #1e2e1a 0%, #2c4228 30%, #3a5c3a 55%, #6a7a50 100%);
+  }
+  /* bg-cell: crops a single photo from a multi-cell screenshot strip */
+  .fp-hero__bg .fp-hero__cell {
+    position: absolute; inset: 0;
+    background-repeat: no-repeat;
+    filter: brightness(.58) contrast(1.12) saturate(.86);
+    will-change: transform;
+  }
+  .fp-hero__bg img {
+    position: absolute; inset: 0; height: 100%;
+    filter: brightness(.58) contrast(1.12) saturate(.86);
+    will-change: transform;
+  }
+  .fp-hero__bg::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to right, rgba(11,11,10,.80) 0%, rgba(11,11,10,.26) 60%, transparent 100%),
+      linear-gradient(to top,   rgba(11,11,10,.88) 0%, transparent 52%);
+  }
+  .fp-hero__content {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 8rem 9rem;
+    max-width: 90rem;
+  }
+  .fp-hero__flag {
+    font-family: var(--font-brand); font-size: .86rem; font-weight: 600;
+    letter-spacing: .28em; text-transform: uppercase; color: var(--sage);
+    margin-bottom: 2.4rem;
+    opacity: 0; transform: translateY(1.6rem);
+    transition: opacity .8s var(--ease), transform .8s var(--ease);
+  }
+  .fp-hero__flag.vis { opacity: 1; transform: none; }
+  .fp-hero__name {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(6rem, 11vw, 15rem);
+    line-height: .88; letter-spacing: -.025em;
+    color: var(--cream);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.1s var(--snap) .18s;
+  }
+  .fp-hero__name.vis { clip-path: inset(0 0 0% 0); }
+  .fp-hero__tagline {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(1.8rem, 2.4vw, 2.8rem); line-height: 1.6;
+    color: var(--mist); margin-top: 2.4rem; max-width: 48ch;
+    opacity: 0; transform: translateY(1.4rem);
+    transition: opacity .8s var(--ease) .48s, transform .8s var(--ease) .48s;
+  }
+  .fp-hero__tagline.vis { opacity: 1; transform: none; }
+
+  .fp-hero__scroll {
+    position: absolute; bottom: 3.8rem; right: 8rem; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+    font-family: var(--font-brand); font-size: .75rem; font-weight: 600;
+    letter-spacing: .28em; text-transform: uppercase; color: var(--smoke);
+    opacity: 0; transition: opacity .8s var(--ease) 1.4s;
+  }
+  .fp-hero__scroll.vis { opacity: 1; }
+  .fp-hero__scroll-line {
+    width: 1px; height: 4.5rem;
+    background: linear-gradient(to bottom, var(--smoke), transparent);
+    animation: scrollPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { transform-origin: top; transform: scaleY(1); opacity: 1; }
+    50%       { transform-origin: top; transform: scaleY(.3); opacity: .2; }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     INFO STRIP
+  ══════════════════════════════════════════════════════════ */
+  .fp-strip {
+    background: var(--ink-2);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: stretch;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .fp-strip::-webkit-scrollbar { display: none; }
+  .fp-stat {
+    flex: 1; min-width: 16rem;
+    padding: 4rem 4.5rem;
+    border-right: 1px solid rgba(255,255,255,.06);
+    display: flex; flex-direction: column; gap: .6rem;
+  }
+  .fp-stat:last-child { border-right: none; }
+  .fp-stat__n {
+    font-family: var(--font-display); font-size: 3.2rem; font-weight: 500;
+    line-height: 1; color: var(--cream); letter-spacing: -.02em;
+  }
+  .fp-stat__n.tbc { color: var(--mist); font-size: 1.8rem; font-family: var(--font-brand); font-weight: 700; letter-spacing: .05em; }
+  .fp-stat__l {
+    font-family: var(--font-brand); font-size: .8rem; font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     ABOUT / DESCRIPTION
+  ══════════════════════════════════════════════════════════ */
+  .fp-about {
+    padding: 13rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-about__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 10rem; align-items: start;
+  }
+  .fp-about__left { position: sticky; top: 18rem; }
+  .fp-about__eyebrow { margin-bottom: 2.4rem; }
+  .fp-about__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.8rem, 5vw, 7rem);
+    line-height: 1.04; letter-spacing: -.01em;
+    color: var(--cream); margin-top: 2rem;
+  }
+  .fp-about__h em { font-style: italic; color: var(--gold); }
+  .fp-about__right { padding-top: 1.2rem; }
+  .fp-about__p {
+    font-size: 1.72rem; font-weight: 300; line-height: 1.88;
+    color: var(--mist); margin-bottom: 3rem;
+  }
+  .fp-about__p:last-child { margin-bottom: 0; }
+
+  /* ══════════════════════════════════════════════════════════
+     GALLERY
+  ══════════════════════════════════════════════════════════ */
+  .fp-gallery {
+    background: var(--ink-2);
+    padding: 0 1.6rem 1.6rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-gallery__header {
+    padding: 8rem 6.4rem 6rem;
+  }
+  .fp-gallery__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3rem, 4vw, 5.5rem);
+    line-height: 1.05; color: var(--cream); margin-top: 1.8rem;
+  }
+  .fp-gallery__grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    grid-template-rows: 46vh 44vh;
+    gap: 1.2rem;
+  }
+  .fp-gallery__item {
+    overflow: hidden; position: relative;
+    background: var(--ink-3);
+  }
+  /* crops one photo from the 4-image horizontal strip */
+  .fp-gallery__item .jk-cell {
+    position: absolute; inset: 0;
+    background-repeat: no-repeat;
+    background-size: 405% 118%;
+    background-image: url('jonkerzicht-grid.png');
+    background-position: var(--jk-x, 0%) var(--jk-y, 50%);
+    filter: brightness(.76) contrast(1.08) saturate(.9);
+    transition: transform .9s var(--ease), filter .4s;
+    will-change: transform;
+  }
+  .fp-gallery__item:hover .jk-cell {
+    transform: scale(1.05);
+    filter: brightness(.86) contrast(1.06) saturate(.94);
+  }
+  .fp-gallery__item img {
+    position: absolute; inset: 0; height: 100%;
+    filter: brightness(.76) contrast(1.08) saturate(.88);
+    transition: transform .9s var(--ease);
+    will-change: transform;
+  }
+  .fp-gallery__item:hover img { transform: scale(1.04); }
+  .fp-gallery__item--tall { grid-row: span 2; }
+
+  /* ══════════════════════════════════════════════════════════
+     OUTDOOR LIVING — feature highlight (replaces floor plans)
+  ══════════════════════════════════════════════════════════ */
+  .fp-highlight {
+    padding: 13rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-highlight__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 10rem; align-items: center;
+  }
+  .fp-highlight__img {
+    aspect-ratio: 4/3; overflow: hidden; position: relative;
+    background: linear-gradient(155deg, #1e2e1a 0%, #2c4228 40%, #4a6840 100%);
+  }
+  .fp-highlight__img img {
+    position: absolute; inset: 0; height: 100%;
+    filter: brightness(.72) contrast(1.1) saturate(.88);
+    transition: transform .9s var(--ease);
+    will-change: transform;
+  }
+  .fp-highlight__img:hover img { transform: scale(1.04); }
+  .fp-highlight__text {}
+  .fp-highlight__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 5vw, 7rem);
+    line-height: 1.04; color: var(--cream); margin-top: 2rem; margin-bottom: 3rem;
+  }
+  .fp-highlight__h em { font-style: italic; color: var(--gold); }
+  .fp-highlight__p {
+    font-size: 1.72rem; font-weight: 300; line-height: 1.85;
+    color: var(--mist);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     FEATURES
+  ══════════════════════════════════════════════════════════ */
+  .fp-features {
+    background: var(--ink-2);
+    padding: 13rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-features__inner { max-width: 148rem; margin: 0 auto; }
+  .fp-features__header { margin-bottom: 8rem; }
+  .fp-features__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3rem, 4vw, 5.5rem);
+    color: var(--cream); margin-top: 1.8rem;
+  }
+  .fp-features__grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .fp-feature {
+    padding: 4rem 4.5rem 4rem 0;
+    border-right: 1px solid rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: flex-start; gap: 2.4rem;
+  }
+  .fp-feature:nth-child(3n) { border-right: none; padding-right: 0; }
+  .fp-feature:nth-child(n+4) { border-bottom: none; }
+  .fp-feature__icon {
+    width: 2.8rem; height: 2.8rem; color: var(--gold); opacity: .7;
+    flex-shrink: 0; margin-top: .3rem;
+  }
+  .fp-feature__name {
+    font-family: var(--font-brand); font-size: .9rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--cream); margin-bottom: .5rem;
+  }
+  .fp-feature__desc {
+    font-size: 1.38rem; font-weight: 300; color: var(--mist); line-height: 1.65;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     FINAL CTA
+  ══════════════════════════════════════════════════════════ */
+  .fp-cta {
+    padding: 16rem 8rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-cta__inner { max-width: 80rem; margin: 0 auto; }
+  .fp-cta__h {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(4.5rem, 8vw, 11rem);
+    line-height: .95; letter-spacing: -.025em;
+    color: var(--cream); margin: 3rem 0 2.8rem;
+  }
+  .fp-cta__h strong { font-style: normal; color: var(--gold); font-weight: 500; }
+  .fp-cta__sub {
+    font-size: 1.7rem; font-weight: 300; color: var(--mist);
+    max-width: 44ch; margin: 0 auto 5rem; line-height: 1.75;
+  }
+  .fp-cta__btns { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; }
+  .fp-cta__contact {
+    margin-top: 4rem; font-size: 1.3rem; font-weight: 300; color: var(--smoke);
+    display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+  }
+  .fp-cta__contact a {
+    color: var(--mist); border-bottom: 1px solid rgba(255,255,255,.12);
+    transition: color .2s, border-color .2s;
+  }
+  .fp-cta__contact a:hover { color: var(--cream); border-color: rgba(255,255,255,.3); }
+
+  /* ══════════════════════════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════════════════════════ */
+  .site-footer {
+    background: var(--ink-2);
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 4.5rem 8rem 16rem;
+  }
+  .site-footer__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+  }
+  .footer-brand {
+    font-family: var(--font-brand); font-size: 1.05rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+  }
+  .footer-copy { font-size: 1.2rem; font-weight: 300; color: rgba(112,108,103,.4); }
+  .footer-links { display: flex; gap: 2.8rem; flex-wrap: wrap; }
+  .footer-link {
+    font-family: var(--font-brand); font-size: .9rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--smoke);
+    transition: color .2s;
+  }
+  .footer-link:hover { color: var(--cream); }
+  .footer-social { display: flex; gap: 1.4rem; align-items: center; }
+  .footer-social__link { color: var(--smoke); transition: color .2s; display: flex; align-items: center; }
+  .footer-social__link:hover { color: var(--cream); }
+
+  /* ══════════════════════════════════════════════════════════
+     UNIT LAYOUT
+  ══════════════════════════════════════════════════════════ */
+  .fp-layout {
+    padding: 13rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-layout__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 10rem; align-items: start;
+  }
+  .fp-layout__left { position: sticky; top: 18rem; }
+  .fp-layout__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.8rem, 5vw, 7rem);
+    line-height: 1.04; letter-spacing: -.01em;
+    color: var(--cream); margin-top: 2rem;
+  }
+  .fp-layout__h em { font-style: italic; color: var(--gold); }
+  .fp-layout__right { padding-top: 1.2rem; display: flex; flex-direction: column; gap: 5rem; }
+  .fp-layout__floor-title {
+    font-family: var(--font-brand); font-size: .82rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--gold-d);
+    margin-bottom: 2rem;
+  }
+  .fp-layout__list { display: flex; flex-direction: column; gap: 1.1rem; }
+  .fp-layout__list li {
+    font-size: 1.65rem; font-weight: 300; color: var(--mist); line-height: 1.6;
+    display: flex; align-items: baseline; gap: 1.4rem;
+  }
+  .fp-layout__list li::before {
+    content: ''; flex-shrink: 0;
+    width: .4rem; height: .4rem; border-radius: 50%;
+    background: var(--gold); opacity: .5;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     RENTAL INFORMATION
+  ══════════════════════════════════════════════════════════ */
+  .fp-rental {
+    background: var(--ink-2);
+    padding: 13rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .fp-rental__inner { max-width: 148rem; margin: 0 auto; }
+  .fp-rental__header { margin-bottom: 8rem; }
+  .fp-rental__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3rem, 4vw, 5.5rem);
+    color: var(--cream); margin-top: 1.8rem;
+  }
+  .fp-rental__grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: rgba(255,255,255,.06);
+    margin-bottom: 7rem;
+  }
+  .fp-rental__block { background: var(--ink-2); padding: 4rem 3.5rem; }
+  .fp-rental__block-title {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+    margin-bottom: 2rem;
+  }
+  .fp-rental__block ul { display: flex; flex-direction: column; gap: .9rem; }
+  .fp-rental__block li {
+    font-size: 1.5rem; font-weight: 300; color: var(--mist); line-height: 1.65;
+  }
+  .fp-rental__block strong {
+    font-weight: 500; color: var(--cream);
+  }
+  .fp-rental__schedule { border-top: 1px solid rgba(255,255,255,.06); padding-top: 6rem; }
+  .fp-rental__schedule-title {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(2.4rem, 3vw, 3.8rem);
+    color: var(--cream); margin-bottom: 5rem;
+    letter-spacing: -.01em;
+  }
+  .fp-rental__schedule-title em { font-style: italic; color: var(--gold); }
+  .fp-rental__schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .fp-rental__pay-method { border: 1px solid rgba(255,255,255,.08); padding: 4rem; }
+  .fp-rental__pay-label {
+    font-family: var(--font-brand); font-size: .8rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--gold-d);
+    margin-bottom: .6rem;
+  }
+  .fp-rental__pay-sub {
+    font-family: var(--font-brand); font-size: .76rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--smoke);
+    margin-bottom: 2.8rem;
+  }
+  .fp-rental__pay-list { display: flex; flex-direction: column; gap: .9rem; }
+  .fp-rental__pay-list li {
+    font-size: 1.45rem; font-weight: 300; color: var(--mist); line-height: 1.7;
+  }
+  .fp-rental__pay-list strong { font-weight: 500; color: var(--cream); }
+
+  /* ── Excluded from rental ─────────────────────────────── */
+  .fp-excluded {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 5rem; padding-top: 4.5rem;
+  }
+  .fp-excluded__label {
+    font-family: var(--font-brand); font-size: .8rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--smoke);
+    margin-bottom: 2.8rem;
+  }
+  .fp-excluded__row { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+  .fp-excluded__tag {
+    display: inline-flex; align-items: center; gap: .8rem;
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--smoke); padding: .85rem 1.6rem;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .fp-excluded__tag::before {
+    content: '×'; color: rgba(201,169,110,.4); font-weight: 700;
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .fp-about__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .fp-about__left { position: static; }
+    .fp-gallery__grid { grid-template-columns: 1fr 1fr; grid-template-rows: 44vh 44vh; }
+    .fp-gallery__item--tall { grid-row: span 1; }
+    .fp-gallery__item:nth-child(4) { display: none; }
+    .fp-highlight__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .fp-features__grid { grid-template-columns: 1fr 1fr; }
+    .fp-feature:nth-child(3n)  { border-right: 1px solid rgba(255,255,255,.06); }
+    .fp-feature:nth-child(2n)  { border-right: none; }
+    .fp-layout__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .fp-layout__left { position: static; }
+    .fp-rental__grid { grid-template-columns: 1fr 1fr; }
+    .fp-rental__schedule-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .fp-about, .fp-highlight, .fp-features, .fp-layout, .fp-rental, .fp-cta { padding-left: 3.5rem; padding-right: 3.5rem; }
+    .fp-gallery { padding: 0 1rem 1rem; }
+    .fp-gallery__header { padding: 6rem 2.4rem 4rem; }
+    .fp-gallery__grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .fp-gallery__item { height: 54vw; min-height: 26rem; }
+    .fp-features__grid { grid-template-columns: 1fr; }
+    .fp-feature { border-right: none !important; }
+    .fp-feature:last-child { border-bottom: none; }
+    .fp-rental__grid { grid-template-columns: 1fr; }
+    .site-footer { padding-left: 3.5rem; padding-right: 3.5rem; }
+    .site-footer__inner { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+    .nav { width: calc(100% - 2.4rem); }
+    .fp-hero__content { padding: 0 3.5rem 8rem; }
+    .fp-hero__scroll { right: 3.5rem; }
+  }
+  @media (max-width: 480px) {
+    html { font-size: 56%; }
+    .fp-cta__btns { flex-direction: column; align-items: center; }
+    .fp-about, .fp-highlight, .fp-features, .fp-layout, .fp-rental, .fp-cta { padding-left: 2.4rem; padding-right: 2.4rem; }
+    .fp-hero__content { padding: 0 2.4rem 7rem; }
+    .fp-rental__schedule-grid { grid-template-columns: 1fr; }
+    .fp-rental__pay-method { padding: 2.8rem; }
+  }
+  </style>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cur"></div>
+
+<!-- Nav -->
+<nav class="nav" aria-label="Main navigation">
+  <a href="index.html" class="nav__back" aria-label="Back to all properties">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M12 5H0M5 1L1 5l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Gradspace
+  </a>
+  <span class="nav__brand">Jonkerzicht</span>
+  <a href="#enquire" class="nav__cta">Enquire</a>
+</nav>
+
+
+<!-- ══ HERO ═══════════════════════════════════════════════════ -->
+<section class="fp-hero" aria-label="Jonkerzicht hero">
+  <div class="fp-hero__bg" id="heroParallax">
+    <!-- cell 2 of 4: Jonkerzicht gate with property name — most iconic shot -->
+    <div class="fp-hero__cell" style="
+      background-image: url('jonkerzicht-grid.png');
+      background-size: 405% 118%;
+      background-position: 33.33% 50%;
+    "></div>
+  </div>
+  <div class="fp-hero__content">
+    <p class="fp-hero__flag" id="heroFlag">03 / 07 — Garden Residence · Simonswyk, Stellenbosch</p>
+    <h1 class="fp-hero__name" id="heroName">Jonkerzicht</h1>
+    <p class="fp-hero__tagline" id="heroTagline">
+      A private walled garden and covered braai terrace — for students
+      who know that where you unwind matters just as much as where you study.
+    </p>
+  </div>
+  <div class="fp-hero__scroll" id="heroScroll" aria-hidden="true">
+    <div class="fp-hero__scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+
+<!-- ══ INFO STRIP ══════════════════════════════════════════════ -->
+<div class="fp-strip" role="list" aria-label="Property key facts">
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">5</div>
+    <div class="fp-stat__l">Bedrooms</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">En-suite</div>
+    <div class="fp-stat__l">All Bedrooms</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">Walking</div>
+    <div class="fp-stat__l">Distance to Campus</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n tbc">Enquire 2026</div>
+    <div class="fp-stat__l">Availability</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">116</div>
+    <div class="fp-stat__l">Merriman Ave, Simonswyk</div>
+  </div>
+</div>
+
+
+<!-- ══ DESCRIPTION ════════════════════════════════════════════ -->
+<section class="fp-about" aria-label="Property description">
+  <div class="fp-about__inner">
+    <div class="fp-about__left">
+      <span class="eyebrow eyebrow--sage fp-about__eyebrow rev">The Property</span>
+      <h2 class="fp-about__h rev d1">
+        Garden walls.<br />Your own<br /><em>world.</em>
+      </h2>
+    </div>
+    <div class="fp-about__right">
+      <p class="fp-about__p rev">
+        Jonkerzicht sits on Merriman Avenue in the quiet residential streets
+        of Simonswyk — one of Stellenbosch's most character-rich neighbourhoods,
+        and well within walking distance of Stellenbosch University's main gate.
+        The property's defining feature is its private walled garden: a contained
+        outdoor world that most student accommodation simply cannot offer.
+      </p>
+      <p class="fp-about__p rev d1">
+        Five-bedroom apartments with en-suite rooms give each tenant privacy where
+        it counts, while the shared kitchen, living area, and covered braai terrace
+        create the kind of social infrastructure that turns a house into a home.
+        The braai terrace has become something of a landmark for residents — a
+        reliable gathering point across every season of the academic year.
+      </p>
+      <p class="fp-about__p rev d2">
+        Water, a washing machine, and curtains are included in the rental price.
+        Garden service runs once a fortnight. Jonkerzicht is managed by Gradspace,
+        which means maintenance is handled promptly and the standard of living is
+        maintained consistently throughout your tenancy.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ GALLERY ═════════════════════════════════════════════════ -->
+<section class="fp-gallery" aria-label="Property gallery">
+  <div class="fp-gallery__header rev">
+    <span class="eyebrow eyebrow--sage">Gallery</span>
+    <h2 class="fp-gallery__h">Inside Jonkerzicht</h2>
+  </div>
+  <div class="fp-gallery__grid">
+
+    <!-- cell 2: Jonkerzicht entrance gate — tall hero cell -->
+    <div class="fp-gallery__item fp-gallery__item--tall rev"
+         aria-label="Jonkerzicht — entrance gate with property name">
+      <div class="jk-cell" style="--jk-x:33.33%;--jk-y:50%;"></div>
+    </div>
+
+    <!-- cell 1: full building facade — Cape Dutch gabled exterior -->
+    <div class="fp-gallery__item rev d1"
+         aria-label="Jonkerzicht — Cape Dutch exterior facade">
+      <div class="jk-cell" style="--jk-x:0%;--jk-y:50%;"></div>
+    </div>
+
+    <!-- cell 3: courtyard with walkway and garden -->
+    <div class="fp-gallery__item rev d1"
+         aria-label="Jonkerzicht — courtyard and garden walkway">
+      <div class="jk-cell" style="--jk-x:66.67%;--jk-y:50%;"></div>
+    </div>
+
+    <!-- cell 4: covered braai / entertainment area -->
+    <div class="fp-gallery__item rev d2"
+         aria-label="Jonkerzicht — covered braai and outdoor entertaining">
+      <div class="jk-cell" style="--jk-x:100%;--jk-y:50%;"></div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ OUTDOOR HIGHLIGHT ════════════════════════════════════ -->
+<section class="fp-highlight" aria-label="Outdoor living at Jonkerzicht">
+  <div class="fp-highlight__inner">
+    <div class="fp-highlight__img rev" style="position:relative;overflow:hidden;">
+      <!-- cell 4: covered braai/outdoor area -->
+      <div style="
+        position:absolute;inset:0;
+        background-image:url('jonkerzicht-grid.png');
+        background-size:405% 118%;
+        background-position:100% 50%;
+        background-repeat:no-repeat;
+        filter:brightness(.72) contrast(1.1) saturate(.88);
+      "></div>
+    </div>
+    <div class="fp-highlight__text">
+      <span class="eyebrow eyebrow--gold rev">Outdoor Living</span>
+      <h2 class="fp-highlight__h rev d1">
+        The garden<br />is the<br /><em>difference.</em>
+      </h2>
+      <p class="fp-highlight__p rev d2">
+        Few student properties in Stellenbosch offer a private garden this size.
+        The walled perimeter creates a sense of belonging to the space — not just
+        living next to it. Whether it's early morning coffee or a late-night braai,
+        Jonkerzicht's outdoor areas are a genuine extension of your living space,
+        not an afterthought.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FEATURES ════════════════════════════════════════════════ -->
+<section class="fp-features" id="enquire" aria-label="Included features">
+  <div class="fp-features__inner">
+    <div class="fp-features__header">
+      <span class="eyebrow eyebrow--sage rev">What's Included</span>
+      <h2 class="fp-features__h rev d1">Included in<br />your rent.</h2>
+    </div>
+    <div class="fp-features__grid">
+
+      <div class="fp-feature rev">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="11" width="18" height="13" rx="1.5"/><path d="M9 11V8a5 5 0 0110 0v3"/><circle cx="14" cy="17" r="2"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">24hr Guarded Complex</p>
+          <p class="fp-feature__desc">Round-the-clock security with controlled access to the complex.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d1">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 20h20M4 20V8l10-4 10 4v12"/><path d="M10 20v-6h8v6"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Partially Furnished</p>
+          <p class="fp-feature__desc">Common areas and kitchen furnished; curtains included throughout.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d2">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2C9 2 5 6 5 11c0 7.5 9 15 9 15s9-7.5 9-15c0-5-4-9-9-9z"/><circle cx="14" cy="11" r="3.5"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">On Campus</p>
+          <p class="fp-feature__desc">Merriman Avenue — a short walk from Stellenbosch University's main gate.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="9" width="22" height="14" rx="1.5"/><circle cx="8" cy="23" r="2"/><circle cx="20" cy="23" r="2"/><path d="M3 14h22"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">4 Secure Parking Bays</p>
+          <p class="fp-feature__desc">4 off-street remote-access parking bays included annually.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d1">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 22c0-5 4-9 10-9s10 4 10 9"/><path d="M14 6a4 4 0 100 8 4 4 0 000-8z"/><path d="M7 22v-2a7 7 0 0114 0v2"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Private Garden &amp; Braai</p>
+          <p class="fp-feature__desc">Walled private garden with covered stoep and built-in braai.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d2">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="6" width="18" height="18" rx="9"/><circle cx="14" cy="15" r="4"/><path d="M10 6V4M18 6V4"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Washing Machine &amp; Water</p>
+          <p class="fp-feature__desc">Washing machine provided; water included in the rental price.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Excluded from rental price -->
+    <div class="fp-excluded rev">
+      <p class="fp-excluded__label">Not included in rental price</p>
+      <div class="fp-excluded__row">
+        <span class="fp-excluded__tag">Electricity</span>
+        <span class="fp-excluded__tag">Bedroom Furniture</span>
+        <span class="fp-excluded__tag">WiFi</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ UNIT LAYOUT ══════════════════════════════════════════════ -->
+<section class="fp-layout" aria-label="Unit layout">
+  <div class="fp-layout__inner">
+    <div class="fp-layout__left">
+      <span class="eyebrow eyebrow--sage fp-about__eyebrow rev">Unit Layout</span>
+      <h2 class="fp-layout__h rev d1">
+        Five en suite<br /><em>bedrooms.</em>
+      </h2>
+    </div>
+    <div class="fp-layout__right">
+      <div class="rev">
+        <p class="fp-layout__floor-title">Upstairs</p>
+        <ul class="fp-layout__list">
+          <li>4 Standard en suite bedrooms</li>
+          <li>1 Large en suite bedroom</li>
+        </ul>
+      </div>
+      <div class="rev d1">
+        <p class="fp-layout__floor-title">Downstairs</p>
+        <ul class="fp-layout__list">
+          <li>Kitchen</li>
+          <li>Lounge</li>
+          <li>Dining area</li>
+          <li>Standard en suite bedroom</li>
+          <li>Double garage</li>
+          <li>2 tandem parking bays</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ RENTAL INFORMATION ══════════════════════════════════════ -->
+<section class="fp-rental" aria-label="2026 rental information">
+  <div class="fp-rental__inner">
+    <div class="fp-rental__header">
+      <span class="eyebrow eyebrow--gold rev">2026 Rental Information</span>
+      <h2 class="fp-rental__h rev d1">Transparent<br />pricing.</h2>
+    </div>
+
+    <div class="fp-rental__grid">
+      <div class="fp-rental__block rev">
+        <p class="fp-rental__block-title">Contract Period</p>
+        <ul>
+          <li>Start date: <strong>9 January 2026</strong></li>
+          <li>End date: <strong>9 December 2026</strong></li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d1">
+        <p class="fp-rental__block-title">Initial Costs</p>
+        <ul>
+          <li>Administration fee: <strong>R 1,800</strong> (non-refundable)</li>
+          <li>Accommodation deposit: <strong>R 20,000</strong></li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d2">
+        <p class="fp-rental__block-title">Accommodation</p>
+        <ul>
+          <li>Standard bedroom, EN SUITE bathroom</li>
+          <li>Large bedroom, EN SUITE bathroom</li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d3">
+        <p class="fp-rental__block-title">Annual Parking Fee</p>
+        <ul>
+          <li>4 secure remote-access parking bays</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fp-rental__schedule rev">
+      <h3 class="fp-rental__schedule-title">Payment schedule — <em>Rental Fee 2026</em></h3>
+      <div class="fp-rental__schedule-grid">
+        <div class="fp-rental__pay-method rev">
+          <p class="fp-rental__pay-label">By EFT</p>
+          <p class="fp-rental__pay-sub">Payable in 3 equal instalments</p>
+          <ul class="fp-rental__pay-list">
+            <li>First instalment: on or before <strong>1 December 2025</strong></li>
+            <li>Second instalment: on or before <strong>1 March 2026</strong></li>
+            <li>Final instalment: on or before <strong>1 June 2026</strong></li>
+          </ul>
+        </div>
+        <div class="fp-rental__pay-method rev d1">
+          <p class="fp-rental__pay-label">By Debit Order</p>
+          <p class="fp-rental__pay-sub">Payable in 12 equal instalments</p>
+          <ul class="fp-rental__pay-list">
+            <li>First instalment: <strong>1 December 2025</strong></li>
+            <li>Twelfth and final: <strong>1 November 2026</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FINAL CTA ═══════════════════════════════════════════════ -->
+<section class="fp-cta" aria-label="Enquire about Jonkerzicht">
+  <div class="fp-cta__inner">
+    <span class="eyebrow eyebrow--sage rev" style="justify-content:center">Enquire for 2026</span>
+    <h2 class="fp-cta__h rev d1">
+      Make Jonkerzicht<br /><strong>yours.</strong>
+    </h2>
+    <p class="fp-cta__sub rev d2">
+      Five bedrooms, one garden, and a home worth coming back to.
+      Reach out and we'll respond within one working day.
+    </p>
+    <div class="fp-cta__btns rev d3">
+      <a href="index.html#apply" class="btn btn--solid">
+        Enquire Now
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="mailto:admin@gradspace.co.za" class="btn btn--outline">Book a Viewing</a>
+    </div>
+    <p class="fp-cta__contact rev d4">
+      <a href="mailto:admin@gradspace.co.za">admin@gradspace.co.za</a>
+      <span style="color:rgba(112,108,103,.4)" aria-hidden="true">·</span>
+      <a href="tel:+27828522024">+27 82 852 2024</a>
+    </p>
+  </div>
+</section>
+
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span class="footer-brand">Gradspace SA</span>
+    <span class="footer-copy">&copy; 2025 Gradspace SA &middot; Jonkerzicht, Stellenbosch</span>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="index.html"                              class="footer-link">All Properties</a>
+      <a href="index.html#apply"                        class="footer-link">Apply</a>
+      <a href="https://gradspace.co.za/fault-report/"   class="footer-link" target="_blank" rel="noopener">Tenant Portal</a>
+      <a href="https://gradspace.co.za/marketplace/"    class="footer-link" target="_blank" rel="noopener">Marketplace</a>
+      <a href="https://gradspace.co.za/wp-content/uploads/Gradspace-House-Rules.pdf" class="footer-link" target="_blank" rel="noopener">House Rules</a>
+      <a href="mailto:admin@gradspace.co.za"            class="footer-link">Contact</a>
+    </nav>
+    <div class="footer-social" aria-label="Social media links">
+      <a href="https://www.facebook.com/people/Gradspace-Student-Housing/100054298579042/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/grad.space/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+'use strict';
+
+/* ── Custom cursor ────────────────────────────────────────── */
+const cur = document.getElementById('cur');
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() {
+  cx += (mx - cx) * .13;
+  cy += (my - cy) * .13;
+  cur.style.left = cx + 'px';
+  cur.style.top  = cy + 'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('lg'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('lg'));
+});
+
+/* ── Hero: load-time reveals ──────────────────────────────── */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('heroFlag').classList.add('vis'),    300);
+  setTimeout(() => document.getElementById('heroName').classList.add('vis'),    550);
+  setTimeout(() => document.getElementById('heroTagline').classList.add('vis'), 850);
+  setTimeout(() => document.getElementById('heroScroll').classList.add('vis'), 1600);
+});
+
+/* ── Hero image parallax ──────────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('#heroParallax img', {
+  yPercent: 18, ease: 'none',
+  scrollTrigger: { trigger: '.fp-hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+/* ── Scroll-reveal (IntersectionObserver) ─────────────────── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+  });
+}, { threshold: .06, rootMargin: '0px 0px -4% 0px' });
+document.querySelectorAll('.rev').forEach(el => io.observe(el));
+
+/* ── Smooth anchor scroll ─────────────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ── Prefers-reduced-motion ───────────────────────────────── */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('.rev').forEach(el => {
+    el.style.transition = 'none'; el.classList.add('on');
+  });
+  ['heroFlag','heroName','heroTagline','heroScroll'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.transition = 'none'; el.classList.add('vis'); }
+  });
+}
+</script>
+</body>
+</html>

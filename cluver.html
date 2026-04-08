@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>24 Cluver Road — Gradspace Student Housing, Stellenbosch</title>
+  <meta name="description" content="24 Cluver Road by Gradspace. One of Stellenbosch's most sought-after student addresses. Premium finishes, central location, and a community that stays." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+  :root {
+    --ink: #0b0b0a; --ink-2: #131312; --ink-3: #1c1b1a;
+    --cream: #f2ede6; --mist: #b9b2a9; --smoke: #706c67;
+    --gold: #c9a96e; --gold-d: #9e7d46; --sage: #7a9480; --linen: #f0ebe2;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1); --snap: cubic-bezier(0.16, 1, 0.3, 1);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-brand: 'Syne', sans-serif; --font-body: 'DM Sans', system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 62.5%; -webkit-font-smoothing: antialiased; scroll-behavior: auto; }
+  body { background: var(--ink); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  ul { list-style: none; }
+  button { cursor: none; font: inherit; background: none; border: none; }
+
+  .eyebrow { display: inline-flex; align-items: center; gap: .75rem; font-family: var(--font-brand); font-size: .86rem; font-weight: 600; letter-spacing: .25em; text-transform: uppercase; }
+  .eyebrow::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; flex-shrink: 0; }
+  .eyebrow--sage { color: var(--sage); } .eyebrow--sage::before { background: var(--sage); }
+  .eyebrow--gold { color: var(--gold-d); } .eyebrow--gold::before { background: var(--gold-d); }
+  .rev { opacity: 0; transform: translateY(2.4rem); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .rev.on { opacity: 1; transform: none; }
+  .d1 { transition-delay: .12s; } .d2 { transition-delay: .26s; }
+  .d3 { transition-delay: .42s; } .d4 { transition-delay: .58s; }
+
+  #cur { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; width: 3.4rem; height: 3.4rem; border-radius: 50%; border: 1px solid rgba(242,237,230,.24); transform: translate(-50%,-50%); transition: width .32s var(--snap), height .32s var(--snap); mix-blend-mode: difference; }
+  #cur.lg { width: 7.2rem; height: 7.2rem; }
+  @media (hover: none) { #cur { display: none; } body, a, button { cursor: auto; } }
+
+  #grain { position: fixed; inset: 0; z-index: 8000; pointer-events: none; opacity: .025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  .nav { position: fixed; bottom: 2.8rem; left: 50%; transform: translateX(-50%); z-index: 700; display: flex; align-items: center; background: color-mix(in srgb, var(--ink) 82%, transparent); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border-radius: 10rem; box-shadow: 0 8px 48px -8px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03); }
+  .nav__back { font-family: var(--font-brand); font-size: .9rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--mist); padding: 1.2rem 1.6rem; border-right: 1px solid rgba(255,255,255,.07); transition: color .2s; display: flex; align-items: center; gap: .7rem; }
+  .nav__back:hover { color: var(--cream); }
+  .nav__brand { font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--cream); padding: 1.2rem 1.8rem; }
+  .nav__cta { font-family: var(--font-brand); font-size: .95rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); background: var(--cream); padding: .95rem 1.8rem; margin: .38rem; border-radius: 10rem; transition: background .2s, color .2s; }
+  .nav__cta:hover { background: var(--gold); color: #fff; }
+
+  .btn { display: inline-flex; align-items: center; gap: 1.2rem; font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 1.5rem 2.8rem; transition: all .25s var(--snap); }
+  .btn:active { transform: scale(.98); }
+  .btn--solid { background: var(--cream); color: var(--ink); } .btn--solid:hover { background: var(--gold); color: #fff; }
+  .btn--outline { border: 1px solid rgba(255,255,255,.2); color: var(--mist); } .btn--outline:hover { border-color: rgba(255,255,255,.52); color: var(--cream); }
+
+  .fp-hero { position: relative; height: 100svh; overflow: hidden; }
+  .fp-hero__bg { position: absolute; inset: 0; background: linear-gradient(160deg, #281e14 0%, #3c2e1e 30%, #5a4830 55%, #8a7050 100%); }
+  .fp-hero__bg img { position: absolute; inset: 0; height: 100%; filter: brightness(.56) contrast(1.12) saturate(.86); will-change: transform; }
+  .fp-hero__bg::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to right, rgba(11,11,10,.84) 0%, rgba(11,11,10,.3) 58%, transparent 100%), linear-gradient(to top, rgba(11,11,10,.9) 0%, transparent 52%); }
+  .fp-hero__content { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 8rem 9rem; max-width: 90rem; }
+  .fp-hero__flag { font-family: var(--font-brand); font-size: .86rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--gold-d); margin-bottom: 2.4rem; opacity: 0; transform: translateY(1.6rem); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .fp-hero__flag.vis { opacity: 1; transform: none; }
+  .fp-hero__name { font-family: var(--font-display); font-weight: 500; font-size: clamp(5rem, 9vw, 13rem); line-height: .88; letter-spacing: -.025em; color: var(--cream); clip-path: inset(0 0 100% 0); transition: clip-path 1.1s var(--snap) .18s; }
+  .fp-hero__name.vis { clip-path: inset(0 0 0% 0); }
+  .fp-hero__tagline { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(1.8rem, 2.4vw, 2.8rem); line-height: 1.6; color: var(--mist); margin-top: 2.4rem; max-width: 48ch; opacity: 0; transform: translateY(1.4rem); transition: opacity .8s var(--ease) .48s, transform .8s var(--ease) .48s; }
+  .fp-hero__tagline.vis { opacity: 1; transform: none; }
+  .fp-hero__scroll { position: absolute; bottom: 3.8rem; right: 8rem; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 1rem; font-family: var(--font-brand); font-size: .75rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--smoke); opacity: 0; transition: opacity .8s var(--ease) 1.4s; }
+  .fp-hero__scroll.vis { opacity: 1; }
+  .fp-hero__scroll-line { width: 1px; height: 4.5rem; background: linear-gradient(to bottom, var(--smoke), transparent); animation: scrollPulse 2.2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%, 100% { transform-origin: top; transform: scaleY(1); opacity: 1; } 50% { transform-origin: top; transform: scaleY(.3); opacity: .2; } }
+
+  .fp-strip { background: var(--ink-2); border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: stretch; overflow-x: auto; scrollbar-width: none; }
+  .fp-strip::-webkit-scrollbar { display: none; }
+  .fp-stat { flex: 1; min-width: 16rem; padding: 4rem 4.5rem; border-right: 1px solid rgba(255,255,255,.06); display: flex; flex-direction: column; gap: .6rem; }
+  .fp-stat:last-child { border-right: none; }
+  .fp-stat__n { font-family: var(--font-display); font-size: 3.2rem; font-weight: 500; line-height: 1; color: var(--cream); letter-spacing: -.02em; }
+  .fp-stat__n.tbc { color: var(--mist); font-size: 1.8rem; font-family: var(--font-brand); font-weight: 700; letter-spacing: .05em; }
+  .fp-stat__l { font-family: var(--font-brand); font-size: .8rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--smoke); }
+
+  .fp-about { padding: 13rem 8rem; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-about__inner { max-width: 148rem; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 10rem; align-items: start; }
+  .fp-about__left { position: sticky; top: 18rem; }
+  .fp-about__eyebrow { margin-bottom: 2.4rem; }
+  .fp-about__h { font-family: var(--font-display); font-weight: 500; font-size: clamp(3.8rem, 5vw, 7rem); line-height: 1.04; letter-spacing: -.01em; color: var(--cream); margin-top: 2rem; }
+  .fp-about__h em { font-style: italic; color: var(--gold); }
+  .fp-about__right { padding-top: 1.2rem; }
+  .fp-about__p { font-size: 1.72rem; font-weight: 300; line-height: 1.88; color: var(--mist); margin-bottom: 3rem; }
+  .fp-about__p:last-child { margin-bottom: 0; }
+
+  .fp-gallery { background: var(--ink-2); padding: 0 1.6rem 1.6rem; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-gallery__header { padding: 8rem 6.4rem 6rem; }
+  .fp-gallery__h { font-family: var(--font-display); font-weight: 500; font-size: clamp(3rem, 4vw, 5.5rem); line-height: 1.05; color: var(--cream); margin-top: 1.8rem; }
+  .fp-gallery__grid { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: 52vh 38vh; gap: 1.6rem; }
+  .fp-gallery__item { overflow: hidden; position: relative; background: var(--ink-3); }
+  .fp-gallery__item img { position: absolute; inset: 0; height: 100%; filter: brightness(.72) contrast(1.1) saturate(.88); transition: transform .9s var(--ease); will-change: transform; }
+  .fp-gallery__item:hover img { transform: scale(1.04); }
+  .fp-gallery__item--tall { grid-row: span 2; }
+
+  .fp-features { background: var(--ink-2); padding: 13rem 8rem; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-features__inner { max-width: 148rem; margin: 0 auto; }
+  .fp-features__header { margin-bottom: 8rem; }
+  .fp-features__h { font-family: var(--font-display); font-weight: 500; font-size: clamp(3rem, 4vw, 5.5rem); color: var(--cream); margin-top: 1.8rem; }
+  .fp-features__grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.06); }
+  .fp-feature { padding: 4rem 4.5rem 4rem 0; border-right: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: flex-start; gap: 2.4rem; }
+  .fp-feature:nth-child(3n) { border-right: none; padding-right: 0; }
+  .fp-feature:nth-child(n+4) { border-bottom: none; }
+  .fp-feature__icon { width: 2.8rem; height: 2.8rem; color: var(--gold); opacity: .7; flex-shrink: 0; margin-top: .3rem; }
+  .fp-feature__name { font-family: var(--font-brand); font-size: .9rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cream); margin-bottom: .5rem; }
+  .fp-feature__desc { font-size: 1.38rem; font-weight: 300; color: var(--mist); line-height: 1.65; }
+
+  .fp-cta { padding: 16rem 8rem; text-align: center; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-cta__inner { max-width: 80rem; margin: 0 auto; }
+  .fp-cta__h { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(4.5rem, 8vw, 11rem); line-height: .95; letter-spacing: -.025em; color: var(--cream); margin: 3rem 0 2.8rem; }
+  .fp-cta__h strong { font-style: normal; color: var(--gold); font-weight: 500; }
+  .fp-cta__sub { font-size: 1.7rem; font-weight: 300; color: var(--mist); max-width: 44ch; margin: 0 auto 5rem; line-height: 1.75; }
+  .fp-cta__btns { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; }
+  .fp-cta__contact { margin-top: 4rem; font-size: 1.3rem; font-weight: 300; color: var(--smoke); display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+  .fp-cta__contact a { color: var(--mist); border-bottom: 1px solid rgba(255,255,255,.12); transition: color .2s, border-color .2s; }
+  .fp-cta__contact a:hover { color: var(--cream); border-color: rgba(255,255,255,.3); }
+
+  .site-footer { background: var(--ink-2); border-top: 1px solid rgba(255,255,255,.06); padding: 4.5rem 8rem 16rem; }
+  .site-footer__inner { max-width: 148rem; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; }
+  .footer-brand { font-family: var(--font-brand); font-size: 1.05rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--smoke); }
+  .footer-copy { font-size: 1.2rem; font-weight: 300; color: rgba(112,108,103,.4); }
+  .footer-links { display: flex; gap: 2.8rem; flex-wrap: wrap; }
+  .footer-link { font-family: var(--font-brand); font-size: .9rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--smoke); transition: color .2s; }
+  .footer-link:hover { color: var(--cream); }
+  .footer-social { display: flex; gap: 1.4rem; align-items: center; }
+  .footer-social__link { color: var(--smoke); transition: color .2s; display: flex; align-items: center; }
+  .footer-social__link:hover { color: var(--cream); }
+
+  .fp-layout { padding: 13rem 8rem; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-layout__inner { max-width: 148rem; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 10rem; align-items: start; }
+  .fp-layout__left { position: sticky; top: 18rem; }
+  .fp-layout__h { font-family: var(--font-display); font-weight: 500; font-size: clamp(3.8rem, 5vw, 7rem); line-height: 1.04; letter-spacing: -.01em; color: var(--cream); margin-top: 2rem; }
+  .fp-layout__h em { font-style: italic; color: var(--gold); }
+  .fp-layout__right { padding-top: 1.2rem; display: flex; flex-direction: column; gap: 5rem; }
+  .fp-layout__floor-title { font-family: var(--font-brand); font-size: .82rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-d); margin-bottom: 2rem; }
+  .fp-layout__list { display: flex; flex-direction: column; gap: 1.1rem; }
+  .fp-layout__list li { font-size: 1.65rem; font-weight: 300; color: var(--mist); line-height: 1.6; display: flex; align-items: baseline; gap: 1.4rem; }
+  .fp-layout__list li::before { content: ''; flex-shrink: 0; width: .4rem; height: .4rem; border-radius: 50%; background: var(--gold); opacity: .5; }
+  .fp-rental { background: var(--ink-2); padding: 13rem 8rem; border-top: 1px solid rgba(255,255,255,.04); }
+  .fp-rental__inner { max-width: 148rem; margin: 0 auto; }
+  .fp-rental__header { margin-bottom: 8rem; }
+  .fp-rental__h { font-family: var(--font-display); font-weight: 500; font-size: clamp(3rem, 4vw, 5.5rem); color: var(--cream); margin-top: 1.8rem; }
+  .fp-rental__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.06); margin-bottom: 7rem; }
+  .fp-rental__block { background: var(--ink-2); padding: 4rem 3.5rem; }
+  .fp-rental__block-title { font-family: var(--font-brand); font-size: .78rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--smoke); margin-bottom: 2rem; }
+  .fp-rental__block ul { display: flex; flex-direction: column; gap: .9rem; }
+  .fp-rental__block li { font-size: 1.5rem; font-weight: 300; color: var(--mist); line-height: 1.65; }
+  .fp-rental__block strong { font-weight: 500; color: var(--cream); }
+  .fp-rental__schedule { border-top: 1px solid rgba(255,255,255,.06); padding-top: 6rem; }
+  .fp-rental__schedule-title { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.4rem, 3vw, 3.8rem); color: var(--cream); margin-bottom: 5rem; letter-spacing: -.01em; }
+  .fp-rental__schedule-title em { font-style: italic; color: var(--gold); }
+  .fp-rental__schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .fp-rental__pay-method { border: 1px solid rgba(255,255,255,.08); padding: 4rem; }
+  .fp-rental__pay-label { font-family: var(--font-brand); font-size: .8rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-d); margin-bottom: .6rem; }
+  .fp-rental__pay-sub { font-family: var(--font-brand); font-size: .76rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--smoke); margin-bottom: 2.8rem; }
+  .fp-rental__pay-list { display: flex; flex-direction: column; gap: .9rem; }
+  .fp-rental__pay-list li { font-size: 1.45rem; font-weight: 300; color: var(--mist); line-height: 1.7; }
+  .fp-rental__pay-list strong { font-weight: 500; color: var(--cream); }
+  .fp-excluded { border-top: 1px solid rgba(255,255,255,.06); margin-top: 5rem; padding-top: 4.5rem; }
+  .fp-excluded__label { font-family: var(--font-brand); font-size: .8rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--smoke); margin-bottom: 2.8rem; }
+  .fp-excluded__row { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+  .fp-excluded__tag { display: inline-flex; align-items: center; gap: .8rem; font-family: var(--font-brand); font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--smoke); padding: .85rem 1.6rem; border: 1px solid rgba(255,255,255,.08); }
+  .fp-excluded__tag::before { content: '×'; color: rgba(201,169,110,.4); font-weight: 700; }
+  @media (max-width: 1100px) { .fp-about__inner { grid-template-columns: 1fr; gap: 6rem; } .fp-about__left { position: static; } .fp-gallery__grid { grid-template-columns: 1fr 1fr; grid-template-rows: 44vh 44vh; } .fp-gallery__item--tall { grid-row: span 1; } .fp-features__grid { grid-template-columns: 1fr 1fr; } .fp-feature:nth-child(3n) { border-right: 1px solid rgba(255,255,255,.06); } .fp-feature:nth-child(2n) { border-right: none; } .fp-layout__inner { grid-template-columns: 1fr; gap: 6rem; } .fp-layout__left { position: static; } .fp-rental__grid { grid-template-columns: 1fr 1fr; } .fp-rental__schedule-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { .fp-about, .fp-features, .fp-layout, .fp-rental, .fp-cta { padding-left: 3.5rem; padding-right: 3.5rem; } .fp-gallery { padding: 0 1rem 1rem; } .fp-gallery__header { padding: 6rem 2.4rem 4rem; } .fp-gallery__grid { grid-template-columns: 1fr; grid-template-rows: auto; } .fp-gallery__item { height: 54vw; min-height: 26rem; } .fp-features__grid { grid-template-columns: 1fr; } .fp-feature { border-right: none !important; } .fp-feature:last-child { border-bottom: none; } .fp-rental__grid { grid-template-columns: 1fr; } .site-footer { padding-left: 3.5rem; padding-right: 3.5rem; } .site-footer__inner { flex-direction: column; text-align: center; } .footer-links { justify-content: center; } .nav { width: calc(100% - 2.4rem); } .fp-hero__content { padding: 0 3.5rem 8rem; } .fp-hero__scroll { right: 3.5rem; } }
+  @media (max-width: 480px) { html { font-size: 56%; } .fp-cta__btns { flex-direction: column; align-items: center; } .fp-about, .fp-features, .fp-layout, .fp-rental, .fp-cta { padding-left: 2.4rem; padding-right: 2.4rem; } .fp-hero__content { padding: 0 2.4rem 7rem; } .fp-rental__pay-method { padding: 2.8rem; } }
+  </style>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cur"></div>
+
+<nav class="nav" aria-label="Main navigation">
+  <a href="index.html" class="nav__back" aria-label="Back to all properties">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M12 5H0M5 1L1 5l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Gradspace
+  </a>
+  <span class="nav__brand">24 Cluver Road</span>
+  <a href="#enquire" class="nav__cta">Enquire</a>
+</nav>
+
+
+<section class="fp-hero" aria-label="24 Cluver Road hero">
+  <div class="fp-hero__bg" id="heroParallax">
+    <img
+      src="https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-02-800-3x2-1.jpg"
+      alt="24 Cluver Road — central Stellenbosch"
+      loading="eager"
+    />
+  </div>
+  <div class="fp-hero__content">
+    <p class="fp-hero__flag" id="heroFlag">07 / 07 — Premium Residence · Cluver Road, Stellenbosch</p>
+    <h1 class="fp-hero__name" id="heroName">24 Cluver Road</h1>
+    <p class="fp-hero__tagline" id="heroTagline">
+      A classic address in central Stellenbosch — the kind of road that
+      generations of students have fought to get onto, and few want to leave.
+    </p>
+  </div>
+  <div class="fp-hero__scroll" id="heroScroll" aria-hidden="true">
+    <div class="fp-hero__scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+
+<div class="fp-strip" role="list" aria-label="Property key facts">
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">Premium</div>
+    <div class="fp-stat__l">Central Address</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">En-suite</div>
+    <div class="fp-stat__l">All Bedrooms</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">Central</div>
+    <div class="fp-stat__l">Stellenbosch Location</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n tbc">Enquire 2026</div>
+    <div class="fp-stat__l">Availability</div>
+  </div>
+  <div class="fp-stat" role="listitem">
+    <div class="fp-stat__n">24</div>
+    <div class="fp-stat__l">Cluver Road, Stellenbosch</div>
+  </div>
+</div>
+
+
+<section class="fp-about" aria-label="Property description">
+  <div class="fp-about__inner">
+    <div class="fp-about__left">
+      <span class="eyebrow eyebrow--gold fp-about__eyebrow rev">The Property</span>
+      <h2 class="fp-about__h rev d1">
+        A road worth<br />choosing.<br /><em>Again.</em>
+      </h2>
+    </div>
+    <div class="fp-about__right">
+      <p class="fp-about__p rev">
+        Cluver Road is one of Stellenbosch's most recognised student addresses.
+        The combination of its central location, the quality of its homes, and
+        the kind of community that tends to form in the better-managed properties
+        has given it a reputation that sustains itself — residents refer their
+        friends, and those friends refer their friends in return.
+      </p>
+      <p class="fp-about__p rev d1">
+        24 Cluver Road offers en-suite bedrooms, a well-appointed communal
+        kitchen, and shared living areas that balance togetherness with
+        individual space. The finishes are premium, the management is consistent,
+        and the location means that everything Stellenbosch offers —
+        restaurants, campus, the town centre — is minutes away on foot.
+      </p>
+      <p class="fp-about__p rev d2">
+        All Gradspace essentials are included: fibre Wi-Fi, dishwasher,
+        laundry, and communal cleaning three times per week. Maintenance
+        is handled through a dedicated system, keeping the property to a
+        standard that justifies why residents return year after year.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<section class="fp-gallery" aria-label="Property gallery">
+  <div class="fp-gallery__header rev">
+    <span class="eyebrow eyebrow--gold">Gallery</span>
+    <h2 class="fp-gallery__h">24 Cluver Road</h2>
+  </div>
+  <div class="fp-gallery__grid">
+
+    <div class="fp-gallery__item fp-gallery__item--tall rev">
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-02-800-3x2-1.jpg"
+        alt="24 Cluver Road — exterior view"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="fp-gallery__item rev d1">
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-01-800-3x2-1.jpg"
+        alt="24 Cluver Road — property detail"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="fp-gallery__item rev d2">
+      <img
+        src="https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-02-800-3x2-1.jpg"
+        alt="24 Cluver Road — interior"
+        loading="lazy"
+        style="object-position: center 65%;"
+      />
+    </div>
+
+  </div>
+</section>
+
+
+<section class="fp-features" id="enquire" aria-label="Included features">
+  <div class="fp-features__inner">
+    <div class="fp-features__header">
+      <span class="eyebrow eyebrow--gold rev">What's Included</span>
+      <h2 class="fp-features__h rev d1">Included in<br />your rent.</h2>
+    </div>
+    <div class="fp-features__grid">
+
+      <div class="fp-feature rev">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2C9 2 5 6 5 11c0 7.5 9 15 9 15s9-7.5 9-15c0-5-4-9-9-9z"/><circle cx="14" cy="11" r="3.5"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Cluver Road Address</p>
+          <p class="fp-feature__desc">Central Stellenbosch — one of the most sought-after student roads in the city.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d1">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 22V14L14 4l10 10v8H4z"/><rect x="10" y="16" width="8" height="6" rx=".5"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">En-Suite Bedrooms</p>
+          <p class="fp-feature__desc">Every bedroom includes a private bathroom — your own space.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d2">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="11" width="18" height="13" rx="1.5"/><path d="M9 11V8a5 5 0 0110 0v3"/><circle cx="14" cy="17" r="2"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Secure Access</p>
+          <p class="fp-feature__desc">Key-controlled entry throughout the building.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="7" width="22" height="16" rx="1.5"/><path d="M3 12h22M8 7V5M20 7V5"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Fibre Wi-Fi</p>
+          <p class="fp-feature__desc">High-speed internet included in your monthly rental rate.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d1">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="14" cy="14" r="10"/><path d="M14 8v6l4 2.5"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">3× Weekly Cleaning</p>
+          <p class="fp-feature__desc">Communal areas professionally serviced three times per week.</p>
+        </div>
+      </div>
+
+      <div class="fp-feature rev d2">
+        <svg class="fp-feature__icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="6" width="20" height="16" rx="1.5"/><path d="M4 11h20M10 17h8"/>
+        </svg>
+        <div>
+          <p class="fp-feature__name">Dishwasher &amp; Laundry</p>
+          <p class="fp-feature__desc">Dishwasher, washing machine and dryer in every unit.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="fp-excluded rev">
+      <p class="fp-excluded__label">Not included in rental price</p>
+      <div class="fp-excluded__row">
+        <span class="fp-excluded__tag">Electricity</span>
+        <span class="fp-excluded__tag">Bedroom Furniture</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ UNIT LAYOUT ══════════════════════════════════════════════ -->
+<section class="fp-layout" aria-label="Unit layout">
+  <div class="fp-layout__inner">
+    <div class="fp-layout__left">
+      <span class="eyebrow eyebrow--gold fp-about__eyebrow rev">Unit Layout</span>
+      <h2 class="fp-layout__h rev d1">
+        Premium<br /><em>en-suite.</em>
+      </h2>
+    </div>
+    <div class="fp-layout__right">
+      <div class="rev">
+        <p class="fp-layout__floor-title">Each Unit Includes</p>
+        <ul class="fp-layout__list">
+          <li>En-suite bedrooms (private bathroom per resident)</li>
+          <li>Well-appointed communal kitchen</li>
+          <li>Shared living areas — premium finishes throughout</li>
+        </ul>
+      </div>
+      <div class="rev d1">
+        <p class="fp-layout__floor-title">Location</p>
+        <ul class="fp-layout__list">
+          <li>24 Cluver Road, central Stellenbosch</li>
+          <li>Walking distance to campus, restaurants, and town centre</li>
+          <li>One of Stellenbosch's most sought-after student addresses</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ RENTAL INFORMATION ══════════════════════════════════════ -->
+<section class="fp-rental" aria-label="2026 rental information">
+  <div class="fp-rental__inner">
+    <div class="fp-rental__header">
+      <span class="eyebrow eyebrow--gold rev">2026 Rental Information</span>
+      <h2 class="fp-rental__h rev d1">Transparent<br />pricing.</h2>
+    </div>
+
+    <div class="fp-rental__grid">
+      <div class="fp-rental__block rev">
+        <p class="fp-rental__block-title">Contract Period</p>
+        <ul>
+          <li>Start date: <strong>9 January 2026</strong></li>
+          <li>End date: <strong>9 December 2026</strong></li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d1">
+        <p class="fp-rental__block-title">Initial Costs</p>
+        <ul>
+          <li>Administration fee: <strong>R 1,800</strong> (non-refundable)</li>
+          <li>Accommodation deposit: <strong>Enquire</strong></li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d2">
+        <p class="fp-rental__block-title">Accommodation</p>
+        <ul>
+          <li>En-suite bedroom</li>
+          <li>Enquire for room types &amp; pricing</li>
+        </ul>
+      </div>
+      <div class="fp-rental__block rev d3">
+        <p class="fp-rental__block-title">Parking</p>
+        <ul>
+          <li>Enquire for parking availability</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fp-rental__schedule rev">
+      <h3 class="fp-rental__schedule-title">Payment schedule — <em>Rental Fee 2026</em></h3>
+      <div class="fp-rental__schedule-grid">
+        <div class="fp-rental__pay-method rev">
+          <p class="fp-rental__pay-label">By EFT</p>
+          <p class="fp-rental__pay-sub">Payable in 3 equal instalments</p>
+          <ul class="fp-rental__pay-list">
+            <li>First instalment: on or before <strong>1 December 2025</strong></li>
+            <li>Second instalment: on or before <strong>1 March 2026</strong></li>
+            <li>Final instalment: on or before <strong>1 June 2026</strong></li>
+          </ul>
+        </div>
+        <div class="fp-rental__pay-method rev d1">
+          <p class="fp-rental__pay-label">By Debit Order</p>
+          <p class="fp-rental__pay-sub">Payable in 12 equal instalments</p>
+          <ul class="fp-rental__pay-list">
+            <li>First instalment: <strong>1 December 2025</strong></li>
+            <li>Twelfth and final: <strong>1 November 2026</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="fp-cta" aria-label="Enquire about 24 Cluver Road">
+  <div class="fp-cta__inner">
+    <span class="eyebrow eyebrow--gold rev" style="justify-content:center">Enquire for 2026</span>
+    <h2 class="fp-cta__h rev d1">
+      Claim your place<br />on <strong>Cluver Road.</strong>
+    </h2>
+    <p class="fp-cta__sub rev d2">
+      The address says everything. Get in touch and we'll respond
+      within one working day.
+    </p>
+    <div class="fp-cta__btns rev d3">
+      <a href="index.html#apply" class="btn btn--solid">
+        Enquire Now
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="mailto:admin@gradspace.co.za" class="btn btn--outline">Book a Viewing</a>
+    </div>
+    <p class="fp-cta__contact rev d4">
+      <a href="mailto:admin@gradspace.co.za">admin@gradspace.co.za</a>
+      <span style="color:rgba(112,108,103,.4)" aria-hidden="true">·</span>
+      <a href="tel:+27828522024">+27 82 852 2024</a>
+    </p>
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span class="footer-brand">Gradspace SA</span>
+    <span class="footer-copy">&copy; 2025 Gradspace SA &middot; 24 Cluver Road, Stellenbosch</span>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="index.html" class="footer-link">All Properties</a>
+      <a href="index.html#apply" class="footer-link">Apply</a>
+      <a href="https://gradspace.co.za/fault-report/" class="footer-link" target="_blank" rel="noopener">Tenant Portal</a>
+      <a href="https://gradspace.co.za/marketplace/" class="footer-link" target="_blank" rel="noopener">Marketplace</a>
+      <a href="https://gradspace.co.za/wp-content/uploads/Gradspace-House-Rules.pdf" class="footer-link" target="_blank" rel="noopener">House Rules</a>
+      <a href="mailto:admin@gradspace.co.za" class="footer-link">Contact</a>
+    </nav>
+    <div class="footer-social" aria-label="Social media links">
+      <a href="https://www.facebook.com/people/Gradspace-Student-Housing/100054298579042/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/grad.space/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+'use strict';
+const cur = document.getElementById('cur');
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() { cx += (mx - cx) * .13; cy += (my - cy) * .13; cur.style.left = cx + 'px'; cur.style.top = cy + 'px'; requestAnimationFrame(tick); })();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('lg'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('lg'));
+});
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('heroFlag').classList.add('vis'), 300);
+  setTimeout(() => document.getElementById('heroName').classList.add('vis'), 550);
+  setTimeout(() => document.getElementById('heroTagline').classList.add('vis'), 850);
+  setTimeout(() => document.getElementById('heroScroll').classList.add('vis'), 1600);
+});
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('#heroParallax img', { yPercent: 18, ease: 'none', scrollTrigger: { trigger: '.fp-hero', start: 'top top', end: 'bottom top', scrub: true } });
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+}, { threshold: .06, rootMargin: '0px 0px -4% 0px' });
+document.querySelectorAll('.rev').forEach(el => io.observe(el));
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => { const t = document.querySelector(a.getAttribute('href')); if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); } });
+});
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('.rev').forEach(el => { el.style.transition = 'none'; el.classList.add('on'); });
+  ['heroFlag','heroName','heroTagline','heroScroll'].forEach(id => { const el = document.getElementById(id); if (el) { el.style.transition = 'none'; el.classList.add('vis'); } });
+}
+</script>
+</body>
+</html>

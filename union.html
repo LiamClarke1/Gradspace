@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Union House — Gradspace Student Living, Stellenbosch</title>
+  <meta name="description" content="Union House — 20 students, two buildings, en-suite bedrooms, uncapped Wi-Fi, 24hr armed response. 14 Soeteweide Road, Stellenbosch." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+  :root {
+    --ink:      #0b0b0a;
+    --ink-2:    #131312;
+    --ink-3:    #1c1b1a;
+    --cream:    #f2ede6;
+    --mist:     #b9b2a9;
+    --smoke:    #706c67;
+    --gold:     #c9a96e;
+    --gold-d:   #9e7d46;
+    --sage:     #7a9480;
+    --linen:    #f0ebe2;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --snap: cubic-bezier(0.16, 1, 0.3, 1);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-brand:   'Syne', sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 62.5%; -webkit-font-smoothing: antialiased; }
+  body { background: var(--ink); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  ul { list-style: none; }
+  button { cursor: none; font: inherit; background: none; border: none; }
+
+  /* Custom cursor */
+  #cur {
+    position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+    width: 3.4rem; height: 3.4rem; border-radius: 50%;
+    border: 1px solid rgba(242,237,230,.24);
+    transform: translate(-50%,-50%);
+    transition: width .32s var(--snap), height .32s var(--snap);
+    mix-blend-mode: difference;
+  }
+  #cur.lg { width: 7.2rem; height: 7.2rem; border-color: rgba(242,237,230,.1); }
+  @media (hover: none) { #cur { display: none; } body, a, button { cursor: auto; } }
+
+  #grain {
+    position: fixed; inset: 0; z-index: 8000; pointer-events: none; opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .75rem;
+    font-family: var(--font-brand); font-size: .86rem; font-weight: 600;
+    letter-spacing: .25em; text-transform: uppercase;
+  }
+  .eyebrow::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; flex-shrink: 0; }
+  .eyebrow--sage  { color: var(--sage); } .eyebrow--sage::before  { background: var(--sage); }
+  .eyebrow--gold  { color: var(--gold-d); } .eyebrow--gold::before  { background: var(--gold-d); }
+
+  /* Reveal */
+  .rev { opacity: 0; transform: translateY(2.4rem); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .rev.on { opacity: 1; transform: none; }
+  .d1 { transition-delay: .12s; } .d2 { transition-delay: .26s; }
+  .d3 { transition-delay: .42s; } .d4 { transition-delay: .58s; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 1.2rem;
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 1.5rem 2.8rem;
+    transition: all .25s var(--snap);
+  }
+  .btn:active { transform: scale(.98); }
+  .btn svg { transition: transform .25s var(--snap); flex-shrink: 0; }
+  .btn:hover svg { transform: translateX(.4rem); }
+  .btn--solid   { background: var(--cream); color: var(--ink); }
+  .btn--solid:hover  { background: var(--gold); color: #fff; }
+  .btn--outline { border: 1px solid rgba(255,255,255,.2); color: var(--mist); }
+  .btn--outline:hover{ border-color: rgba(255,255,255,.52); color: var(--cream); }
+
+  /* ── NAV ─────────────────────────────────────────────── */
+  .nav {
+    position: fixed; bottom: 2.8rem; left: 50%; transform: translateX(-50%);
+    z-index: 700;
+    display: flex; align-items: center;
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(32px);
+    border-radius: 10rem;
+    box-shadow: 0 8px 48px -8px rgba(0,0,0,.8);
+  }
+  .nav__brand {
+    font-family: var(--font-brand); font-size: 1.08rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--cream);
+    padding: 1.2rem 1.8rem;
+    border-right: 1px solid rgba(255,255,255,.07);
+  }
+  .nav__links { display: flex; }
+  .nav__link {
+    font-family: var(--font-brand); font-size: .95rem; font-weight: 600;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--mist);
+    padding: 1.2rem 1.35rem; transition: color .2s;
+  }
+  .nav__link:hover { color: var(--cream); }
+  .nav__cta {
+    font-family: var(--font-brand); font-size: .95rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink); background: var(--cream);
+    padding: .95rem 1.8rem; margin: .38rem;
+    border-radius: 10rem; transition: background .2s;
+  }
+  .nav__cta:hover { background: var(--gold); color: #fff; }
+
+  /* ── HERO ────────────────────────────────────────────── */
+  .u-hero {
+    position: relative; height: 100svh; overflow: hidden;
+  }
+  .u-hero__bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(155deg, #2e1e0e 0%, #4a3018 18%, #6b4822 36%, #8a6030 52%, #a07840 68%, #b89258 82%, #c8a870 100%);
+  }
+  .u-hero__img {
+    position: absolute; inset: 0;
+    filter: brightness(.65) contrast(1.06) saturate(.9);
+  }
+  .u-hero__img img { height: 100%; }
+  .u-hero__scrim {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to right, rgba(11,11,10,.85) 0%, rgba(11,11,10,.4) 55%, transparent 100%),
+      linear-gradient(to top, rgba(11,11,10,.8) 0%, transparent 50%);
+  }
+  .u-hero__content {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 8rem 10rem;
+    max-width: 90rem;
+  }
+  .u-hero__back {
+    position: absolute; top: 3.2rem; left: 3.2rem; z-index: 3;
+    font-family: var(--font-brand); font-size: .88rem; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--mist);
+    display: inline-flex; align-items: center; gap: .8rem;
+    transition: color .2s;
+  }
+  .u-hero__back:hover { color: var(--cream); }
+  .u-hero__num {
+    font-family: var(--font-brand); font-size: .88rem; font-weight: 600;
+    letter-spacing: .28em; text-transform: uppercase; color: var(--sage);
+    margin-bottom: 1.6rem;
+    opacity: 0; transform: translateY(1.6rem);
+    animation: fadeUp .7s var(--ease) .2s forwards;
+  }
+  .u-hero__avail {
+    display: inline-flex; align-items: center; gap: .65rem;
+    font-family: var(--font-brand); font-size: .84rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: .52rem 1.25rem; border-radius: 10rem;
+    color: var(--gold); border: 1px solid rgba(201,169,110,.28); background: rgba(201,169,110,.1);
+    margin-bottom: 2.8rem; width: fit-content;
+    opacity: 0; transform: translateY(1.4rem);
+    animation: fadeUp .7s var(--ease) .34s forwards;
+  }
+  .u-hero__avail::before { content: ''; width: .42rem; height: .42rem; border-radius: 50%; background: var(--gold); }
+  .u-hero__name {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(6rem, 11vw, 15rem);
+    line-height: .88; letter-spacing: -.02em; color: var(--cream);
+    margin-bottom: 3rem;
+    clip-path: inset(0 0 100% 0);
+    animation: clipReveal .95s var(--snap) .4s forwards;
+  }
+  .u-hero__tagline {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(1.8rem, 2.4vw, 2.8rem); line-height: 1.6; color: var(--mist);
+    max-width: 52ch; margin-bottom: 4rem;
+    opacity: 0; transform: translateY(1.4rem);
+    animation: fadeUp .7s var(--ease) .62s forwards;
+  }
+  .u-hero__facts {
+    display: flex; gap: 4rem; flex-wrap: wrap; margin-bottom: 4.5rem;
+    opacity: 0; transform: translateY(1.4rem);
+    animation: fadeUp .7s var(--ease) .76s forwards;
+  }
+  .u-hero__fact { display: flex; flex-direction: column; }
+  .u-hero__fact-n {
+    font-family: var(--font-brand); font-size: 2.6rem; font-weight: 800;
+    letter-spacing: -.03em; color: var(--cream); line-height: 1;
+  }
+  .u-hero__fact-l {
+    font-size: 1.05rem; font-weight: 400; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--smoke); margin-top: .3rem;
+  }
+  .u-hero__cta {
+    display: flex; gap: 1.4rem; flex-wrap: wrap;
+    opacity: 0; transform: translateY(1.4rem);
+    animation: fadeUp .7s var(--ease) .9s forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes clipReveal {
+    to { clip-path: inset(0 0 0% 0); }
+  }
+
+  /* ── ADDRESS BAR ─────────────────────────────────────── */
+  .u-address {
+    background: var(--ink-2);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 2.4rem 8rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
+  }
+  .u-address__text {
+    font-family: var(--font-brand); font-size: .88rem; font-weight: 600;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--smoke);
+  }
+  .u-address__text strong { color: var(--mist); font-weight: 700; }
+  .u-address__link {
+    font-family: var(--font-brand); font-size: .84rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--gold-d);
+    border-bottom: 1px solid rgba(201,169,110,.3);
+    transition: color .2s, border-color .2s;
+  }
+  .u-address__link:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* ── PHOTO GALLERY ───────────────────────────────────── */
+  .u-gallery {
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr;
+    grid-template-rows: 52vh 38vh;
+    gap: .8rem;
+    padding: .8rem;
+    background: var(--ink);
+  }
+  .u-gallery__cell {
+    position: relative; overflow: hidden;
+    background: var(--ink-3);
+  }
+  /* Cell-from-grid: one photo from a 4×2 screenshot collage */
+  .u-gallery__cell .u-cell {
+    position: absolute; inset: 0;
+    background-repeat: no-repeat;
+    background-size: 412% 212%;
+    background-image: var(--u-img);
+    background-position: var(--u-x, 0%) var(--u-y, 0%);
+    filter: brightness(.80) contrast(1.06) saturate(.9);
+    transition: transform .85s var(--ease), filter .4s;
+    will-change: transform;
+  }
+  .u-gallery__cell:hover .u-cell {
+    transform: scale(1.05);
+    filter: brightness(.88) contrast(1.04) saturate(.92);
+  }
+  .u-gallery__cell--main { grid-row: span 2; }
+
+  /* ── OVERVIEW ─────────────────────────────────────────── */
+  .u-overview {
+    background: var(--linen); color: var(--ink);
+    padding: 12rem 8rem;
+  }
+  .u-overview__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 10rem; align-items: start;
+  }
+  .u-overview__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.8rem, 5.5vw, 7.2rem);
+    line-height: 1.06; letter-spacing: -.01em;
+    color: var(--ink); margin: 2.2rem 0 3rem;
+  }
+  .u-overview__h em { font-style: italic; color: var(--gold-d); }
+  .u-overview__body {
+    font-size: 1.72rem; font-weight: 300; line-height: 1.84;
+    color: #4a4540; margin-bottom: 5rem; max-width: 54ch;
+  }
+  .u-overview__stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: rgba(11,11,10,.1);
+    border: 1px solid rgba(11,11,10,.1);
+  }
+  .u-overview__stat {
+    padding: 3.2rem 3rem;
+    background: var(--linen);
+  }
+  .u-overview__stat-n {
+    font-family: var(--font-brand); font-size: 3rem; font-weight: 800;
+    letter-spacing: -.04em; color: var(--ink); line-height: 1; margin-bottom: .6rem;
+  }
+  .u-overview__stat-l {
+    font-size: 1.1rem; font-weight: 400; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--smoke);
+  }
+  .u-overview__right { display: flex; flex-direction: column; gap: 2rem; }
+  .u-detail-item {
+    display: flex; align-items: flex-start; gap: 2rem;
+    padding: 2.8rem 0;
+    border-bottom: 1px solid rgba(11,11,10,.08);
+  }
+  .u-detail-item:first-child { border-top: 1px solid rgba(11,11,10,.08); }
+  .u-detail-icon {
+    width: 3rem; height: 3rem; flex-shrink: 0;
+    color: var(--gold-d); margin-top: .2rem;
+  }
+  .u-detail-title {
+    font-family: var(--font-brand); font-size: .92rem; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--ink);
+    margin-bottom: .6rem;
+  }
+  .u-detail-desc {
+    font-size: 1.45rem; font-weight: 300; line-height: 1.75; color: #4a4540;
+  }
+
+  /* ── INCLUSIONS ───────────────────────────────────────── */
+  .u-inclusions {
+    background: var(--ink-2);
+    padding: 12rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .u-inclusions__inner { max-width: 148rem; margin: 0 auto; }
+  .u-inclusions__head { margin-bottom: 7rem; }
+  .u-inclusions__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 4.8vw, 6.5rem);
+    line-height: 1.06; letter-spacing: -.01em;
+    color: var(--cream); margin: 2.2rem 0 0;
+  }
+  .u-inclusions__h em { font-style: italic; color: var(--gold); }
+  .u-incl-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+  }
+  .u-incl-card {
+    padding: 3.2rem 2.8rem;
+    border: 1px solid rgba(255,255,255,.065);
+    background: var(--ink);
+  }
+  .u-incl-icon {
+    width: 3rem; height: 3rem; margin-bottom: 2rem;
+    color: var(--gold); display: block;
+  }
+  .u-incl-title {
+    font-family: var(--font-brand); font-size: .92rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--cream); margin-bottom: .9rem;
+  }
+  .u-incl-desc {
+    font-size: 1.38rem; font-weight: 300; line-height: 1.75; color: var(--mist);
+  }
+
+  /* ── LEASE PANEL ──────────────────────────────────────── */
+  .u-lease {
+    background: var(--ink);
+    padding: 12rem 8rem;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .u-lease__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10rem; align-items: center;
+  }
+  .u-lease__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 4.8vw, 6.5rem);
+    line-height: 1.06; letter-spacing: -.01em;
+    color: var(--cream); margin: 2.2rem 0 3rem;
+  }
+  .u-lease__h em { font-style: italic; color: var(--gold); }
+  .u-lease__body {
+    font-size: 1.62rem; font-weight: 300; line-height: 1.84;
+    color: var(--mist); margin-bottom: 5rem; max-width: 50ch;
+  }
+  .u-lease-cells {
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(255,255,255,.07);
+    background: var(--ink-2);
+  }
+  .u-lease-cell {
+    padding: 3.8rem 4rem;
+    border-bottom: 1px solid rgba(255,255,255,.065);
+  }
+  .u-lease-cell:last-child { border-bottom: none; }
+  .u-lease-cell__label {
+    font-family: var(--font-brand); font-size: .78rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--gold-d); margin-bottom: 1rem;
+  }
+  .u-lease-cell__val {
+    font-family: var(--font-display); font-size: 3rem; font-weight: 500;
+    color: var(--cream); line-height: 1.1; margin-bottom: 1.2rem;
+  }
+  .u-lease-cell__note {
+    font-size: 1.38rem; font-weight: 300; line-height: 1.75; color: var(--smoke);
+  }
+
+  /* ── CTA PANEL ────────────────────────────────────────── */
+  .u-cta {
+    background: var(--ink-2);
+    padding: 16rem 8rem;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .u-cta__inner { max-width: 90rem; margin: 0 auto; }
+  .u-cta__h {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(5rem, 8vw, 12rem);
+    line-height: .95; letter-spacing: -.025em;
+    color: var(--cream); margin: 3.5rem 0 3rem;
+  }
+  .u-cta__h strong { font-style: normal; color: var(--gold); font-weight: 500; }
+  .u-cta__sub {
+    font-size: 1.72rem; font-weight: 300; line-height: 1.75; color: var(--mist);
+    max-width: 48ch; margin: 0 auto 5rem;
+  }
+  .u-cta__btns { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; }
+  .u-cta__contact {
+    margin-top: 4rem; font-size: 1.38rem; font-weight: 300; color: var(--smoke);
+    display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+  }
+  .u-cta__contact a { color: var(--mist); border-bottom: 1px solid rgba(255,255,255,.12); transition: color .2s; }
+  .u-cta__contact a:hover { color: var(--cream); }
+
+  /* ── FOOTER ───────────────────────────────────────────── */
+  .site-footer {
+    background: var(--ink-2);
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 4.5rem 8rem 16rem;
+  }
+  .site-footer__inner {
+    max-width: 148rem; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+  }
+  .footer-brand {
+    font-family: var(--font-brand); font-size: 1.05rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--smoke);
+  }
+  .footer-copy { font-size: 1.2rem; font-weight: 300; color: rgba(112,108,103,.4); }
+  .footer-links { display: flex; gap: 2.8rem; }
+  .footer-link {
+    font-family: var(--font-brand); font-size: .9rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--smoke);
+    transition: color .2s;
+  }
+  .footer-link:hover { color: var(--cream); }
+  .footer-social { display: flex; gap: 1.4rem; align-items: center; }
+  .footer-social__link { color: var(--smoke); transition: color .2s; display: flex; align-items: center; }
+  .footer-social__link:hover { color: var(--cream); }
+
+  .u-excl { border-top: 1px solid rgba(255,255,255,.06); margin-top: 5rem; padding-top: 4.5rem; }
+  .u-excl__label { font-family: var(--font-brand); font-size: .8rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--smoke); margin-bottom: 2.8rem; }
+  .u-excl__row { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+  .u-excl__tag { display: inline-flex; align-items: center; gap: .8rem; font-family: var(--font-brand); font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--smoke); padding: .85rem 1.6rem; border: 1px solid rgba(255,255,255,.08); }
+  .u-excl__tag::before { content: '×'; color: rgba(201,169,110,.4); font-weight: 700; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    html { font-size: 58%; }
+    .u-hero__content, .u-address, .u-overview, .u-inclusions, .u-lease, .u-cta, .site-footer { padding-left: 4rem; padding-right: 4rem; }
+    .u-overview__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .u-lease__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .u-incl-grid { grid-template-columns: repeat(2, 1fr); }
+    .u-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .u-gallery__cell--main { grid-row: span 1; height: 55vh; }
+    .u-gallery__cell { height: 40vh; }
+  }
+  @media (max-width: 640px) {
+    html { font-size: 50%; }
+    .nav__links { display: none; }
+    .u-hero__content { padding: 0 2.4rem 14rem; }
+    .u-gallery { grid-template-columns: 1fr; }
+    .u-incl-grid { grid-template-columns: 1fr; }
+    .u-overview__stats { grid-template-columns: 1fr; }
+  }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<div id="grain"></div>
+<div id="cur"></div>
+
+<!-- NAV -->
+<nav class="nav" aria-label="Main navigation">
+  <a href="index.html" class="nav__brand">Gradspace</a>
+  <div class="nav__links">
+    <a href="index.html#collection" class="nav__link">Properties</a>
+    <a href="index.html#services" class="nav__link">Services</a>
+    <a href="index.html#why" class="nav__link">About</a>
+    <a href="index.html#apply" class="nav__link">Apply</a>
+  </div>
+  <a href="index.html#apply" class="nav__cta">Enquire</a>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="u-hero" aria-label="Union House hero">
+  <a href="index.html" class="u-hero__back">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M14 5H2M6.5 1l-4 4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All Properties
+  </a>
+
+  <div class="u-hero__bg">
+    <div class="u-hero__img">
+      <!-- union-grid-1: top-left cell = exterior building front -->
+      <div style="
+        position:absolute;inset:0;
+        background-image:url('union-grid-1.png');
+        background-repeat:no-repeat;
+        background-size:412% 215%;
+        background-position:0% 0%;
+      "></div>
+    </div>
+    <div class="u-hero__scrim"></div>
+  </div>
+
+  <div class="u-hero__content">
+    <p class="u-hero__num">02 / 07 — Community Residence</p>
+    <span class="u-hero__avail">Fully Let 2025 · Enquire for 2026</span>
+    <h1 class="u-hero__name">Union<br />House</h1>
+    <p class="u-hero__tagline">
+      Two buildings. Twenty students. A home that takes care of
+      everything — so you can focus on the things that matter.
+    </p>
+    <div class="u-hero__facts">
+      <div class="u-hero__fact">
+        <div class="u-hero__fact-n">20</div>
+        <div class="u-hero__fact-l">Students</div>
+      </div>
+      <div class="u-hero__fact">
+        <div class="u-hero__fact-n">2</div>
+        <div class="u-hero__fact-l">Buildings</div>
+      </div>
+      <div class="u-hero__fact">
+        <div class="u-hero__fact-n">24hr</div>
+        <div class="u-hero__fact-l">Armed Response</div>
+      </div>
+      <div class="u-hero__fact">
+        <div class="u-hero__fact-n">~5</div>
+        <div class="u-hero__fact-l">Min Walk to Campus</div>
+      </div>
+    </div>
+    <div class="u-hero__cta">
+      <a href="index.html#apply" class="btn btn--solid">
+        Enquire About Union House
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="index.html#collection" class="btn btn--outline">View All Properties</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ADDRESS BAR -->
+<div class="u-address">
+  <p class="u-address__text">
+    <strong>14 Soeteweide Road</strong> &nbsp;·&nbsp; Universiteits Oord &nbsp;·&nbsp; Stellenbosch 7600
+  </p>
+  <a
+    href="https://maps.google.com/?q=14+Soeteweide+Road+Stellenbosch"
+    target="_blank" rel="noopener"
+    class="u-address__link"
+  >Open in Maps ↗</a>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PHOTO GALLERY
+══════════════════════════════════════════ -->
+<section class="u-gallery" aria-label="Union House photo gallery">
+
+  <!-- Exterior building front — main tall hero cell -->
+  <div class="u-gallery__cell u-gallery__cell--main"
+       style="--u-img:url('union-grid-1.png'); --u-x:0%; --u-y:0%"
+       aria-label="Union House — exterior front">
+    <div class="u-cell"></div>
+  </div>
+
+  <!-- Modern facade + stepped walkway close-up -->
+  <div class="u-gallery__cell"
+       style="--u-img:url('union-grid-1.png'); --u-x:67%; --u-y:0%"
+       aria-label="Union House — building facade detail">
+    <div class="u-cell"></div>
+  </div>
+
+  <!-- Balcony / corridor with railing and tree views -->
+  <div class="u-gallery__cell"
+       style="--u-img:url('union-grid-2.png'); --u-x:0%; --u-y:0%"
+       aria-label="Union House — balcony and corridor">
+    <div class="u-cell"></div>
+  </div>
+
+  <!-- Grey open-plan lounge / living room -->
+  <div class="u-gallery__cell"
+       style="--u-img:url('union-grid-2.png'); --u-x:67%; --u-y:100%"
+       aria-label="Union House — communal lounge">
+    <div class="u-cell"></div>
+  </div>
+
+  <!-- Balcony looking out to tree canopy -->
+  <div class="u-gallery__cell"
+       style="--u-img:url('union-grid-1.png'); --u-x:100%; --u-y:100%"
+       aria-label="Union House — balcony view">
+    <div class="u-cell"></div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     OVERVIEW
+══════════════════════════════════════════ -->
+<section class="u-overview" aria-label="Union House overview">
+  <div class="u-overview__inner">
+
+    <div>
+      <span class="eyebrow eyebrow--gold rev">Union House</span>
+      <h2 class="u-overview__h rev d1">
+        Community<br />
+        living,<br />
+        <em>elevated.</em>
+      </h2>
+      <p class="u-overview__body rev d2">
+        Union House isn't a standard student rental. It's two buildings, twenty
+        people, and a shared life — structured around the things that make
+        student years worth having. Fully serviced, fully connected,
+        and five minutes from the Stellenbosch University main gate.
+      </p>
+
+      <div class="u-overview__stats rev d3">
+        <div class="u-overview__stat">
+          <div class="u-overview__stat-n">20</div>
+          <div class="u-overview__stat-l">Students total</div>
+        </div>
+        <div class="u-overview__stat">
+          <div class="u-overview__stat-n">2</div>
+          <div class="u-overview__stat-l">Buildings</div>
+        </div>
+        <div class="u-overview__stat">
+          <div class="u-overview__stat-n">~5</div>
+          <div class="u-overview__stat-l">Min walk to campus</div>
+        </div>
+        <div class="u-overview__stat">
+          <div class="u-overview__stat-n">24hr</div>
+          <div class="u-overview__stat-l">Armed response</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="u-overview__right rev d2">
+      <div class="u-detail-item">
+        <svg class="u-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="u-detail-title">En-Suite Bedrooms</div>
+          <div class="u-detail-desc">Most bedrooms at Union House include private en-suite bathrooms — your own space within a communal home.</div>
+        </div>
+      </div>
+      <div class="u-detail-item">
+        <svg class="u-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="u-detail-title">Uncapped Fibre Wi-Fi</div>
+          <div class="u-detail-desc">High-speed uncapped fibre internet included in your monthly rental — no throttling, no data caps, no extra bills.</div>
+        </div>
+      </div>
+      <div class="u-detail-item">
+        <svg class="u-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="u-detail-title">3× Weekly Cleaning</div>
+          <div class="u-detail-desc">Shared communal areas are professionally cleaned three times per week. Your kitchen and lounge stay spotless without any effort from you.</div>
+        </div>
+      </div>
+      <div class="u-detail-item">
+        <svg class="u-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="u-detail-title">24hr Armed Response</div>
+          <div class="u-detail-desc">Round-the-clock armed security response linked to the property. Your safety is a permanent priority, not an afterthought.</div>
+        </div>
+      </div>
+      <div class="u-detail-item">
+        <svg class="u-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="u-detail-title">On-Call Management</div>
+          <div class="u-detail-desc">Dedicated property management team handles all maintenance and queries. Real people who show up, reliably and promptly.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     WHAT'S INCLUDED
+══════════════════════════════════════════ -->
+<section class="u-inclusions" aria-label="What's included at Union House">
+  <div class="u-inclusions__inner">
+    <div class="u-inclusions__head">
+      <span class="eyebrow eyebrow--gold rev">What's Included</span>
+      <h2 class="u-inclusions__h rev d1">Move in.<br /><em>Everything's ready.</em></h2>
+    </div>
+    <div class="u-incl-grid">
+      <div class="u-incl-card rev">
+        <svg class="u-incl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="u-incl-title">Uncapped Wi-Fi</div>
+        <div class="u-incl-desc">High-speed fibre, no data limits.</div>
+      </div>
+      <div class="u-incl-card rev d1">
+        <svg class="u-incl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="u-incl-title">Cleaning 3×/Week</div>
+        <div class="u-incl-desc">Communal areas professionally serviced.</div>
+      </div>
+      <div class="u-incl-card rev d2">
+        <svg class="u-incl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="u-incl-title">Water &amp; Rates</div>
+        <div class="u-incl-desc">Municipal water and all rates included.</div>
+      </div>
+      <div class="u-incl-card rev d3">
+        <svg class="u-incl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="u-incl-title">Furnished Lounge &amp; Kitchen</div>
+        <div class="u-incl-desc">Dishwasher and laundry on-site.</div>
+      </div>
+    </div>
+
+    <div class="u-excl rev">
+      <p class="u-excl__label">Not included in rental price</p>
+      <div class="u-excl__row">
+        <span class="u-excl__tag">Electricity</span>
+        <span class="u-excl__tag">Bedroom Furniture</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     LEASE & PRICING
+══════════════════════════════════════════ -->
+<section class="u-lease" aria-label="Lease and pricing information">
+  <div class="u-lease__inner">
+    <div>
+      <span class="eyebrow eyebrow--sage rev">Lease &amp; Pricing</span>
+      <h2 class="u-lease__h rev d1">
+        Transparent.<br /><em>No surprises.</em>
+      </h2>
+      <p class="u-lease__body rev d2">
+        Union House runs on a full-year lease from <strong>9 January to 9 December 2026</strong>.
+        Pay in 3 equal EFT instalments or 12 monthly debit orders —
+        first payment due <strong>1 December 2025</strong>.
+        Administration fee: <strong>R 1,800</strong> (non-refundable). Contact us for a full 2026 rate breakdown by room type.
+      </p>
+      <a href="index.html#apply" class="btn btn--solid rev d3" style="margin-top:1rem">
+        Get 2026 Pricing
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="u-lease-cells rev d2">
+      <div class="u-lease-cell">
+        <div class="u-lease-cell__label">Contract Period</div>
+        <div class="u-lease-cell__val">Jan – Dec</div>
+        <div class="u-lease-cell__note">9 January 2026 – 9 December 2026. Full academic year lease.</div>
+      </div>
+      <div class="u-lease-cell">
+        <div class="u-lease-cell__label">Initial Costs</div>
+        <div class="u-lease-cell__val">R 1,800</div>
+        <div class="u-lease-cell__note">Non-refundable administration fee. Accommodation deposit on enquiry.</div>
+      </div>
+      <div class="u-lease-cell">
+        <div class="u-lease-cell__label">EFT — 3 Instalments</div>
+        <div class="u-lease-cell__val">3×</div>
+        <div class="u-lease-cell__note">1 Dec 2025 · 1 Mar 2026 · 1 Jun 2026</div>
+      </div>
+      <div class="u-lease-cell">
+        <div class="u-lease-cell__label">Debit Order — 12 Months</div>
+        <div class="u-lease-cell__val">12×</div>
+        <div class="u-lease-cell__note">First instalment 1 December 2025 · Final 1 November 2026.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CTA
+══════════════════════════════════════════ -->
+<section class="u-cta" aria-label="Apply for Union House">
+  <div class="u-cta__inner">
+    <span class="eyebrow eyebrow--sage rev" style="justify-content:center">Enquire Now</span>
+    <h2 class="u-cta__h rev d1">
+      Your place<br />in <strong>Union House.</strong>
+    </h2>
+    <p class="u-cta__sub rev d2">
+      Union House fills fast. Tell us you're interested and we'll be in touch within one working day.
+    </p>
+    <div class="u-cta__btns rev d3">
+      <a href="index.html#apply" class="btn btn--solid">
+        Apply Now
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h14M9 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="mailto:admin@gradspace.co.za" class="btn btn--outline">Email Us Directly</a>
+    </div>
+    <p class="u-cta__contact rev d4">
+      <a href="mailto:admin@gradspace.co.za">admin@gradspace.co.za</a>
+      <span style="color:rgba(112,108,103,.4)">·</span>
+      <a href="tel:+27828522024">+27 82 852 2024</a>
+    </p>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span class="footer-brand">Gradspace SA</span>
+    <span class="footer-copy">&copy; 2025 Gradspace SA &middot; Student Housing in Stellenbosch</span>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="index.html#collection" class="footer-link">All Properties</a>
+      <a href="index.html#apply" class="footer-link">Apply</a>
+      <a href="https://gradspace.co.za/fault-report/" class="footer-link" target="_blank" rel="noopener">Tenant Portal</a>
+      <a href="https://gradspace.co.za/marketplace/" class="footer-link" target="_blank" rel="noopener">Marketplace</a>
+      <a href="https://gradspace.co.za/wp-content/uploads/Gradspace-House-Rules.pdf" class="footer-link" target="_blank" rel="noopener">House Rules</a>
+      <a href="mailto:admin@gradspace.co.za" class="footer-link">Contact</a>
+    </nav>
+    <div class="footer-social" aria-label="Social media links">
+      <a href="https://www.facebook.com/people/Gradspace-Student-Housing/100054298579042/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/grad.space/" class="footer-social__link" target="_blank" rel="noopener" aria-label="Gradspace on Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+'use strict';
+
+/* ── Custom cursor ──────────────────────────────────── */
+const cur = document.getElementById('cur');
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() {
+  cx += (mx - cx) * .13; cy += (my - cy) * .13;
+  cur.style.left = cx + 'px'; cur.style.top = cy + 'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('lg'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('lg'));
+});
+
+/* ── Scroll reveal ──────────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
+
+const revIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('on'); revIO.unobserve(e.target); }
+  });
+}, { threshold: .06, rootMargin: '0px 0px -3% 0px' });
+document.querySelectorAll('.rev').forEach(el => revIO.observe(el));
+
+/* ── Subtle parallax on gallery cells ───────────────── */
+gsap.utils.toArray('.u-gallery__cell .u-cell').forEach(cell => {
+  gsap.fromTo(cell,
+    { yPercent: -5 },
+    { yPercent: 5, ease: 'none',
+      scrollTrigger: { trigger: cell.closest('.u-gallery__cell'), start: 'top bottom', end: 'bottom top', scrub: true }
+    }
+  );
+});
+
+/* ── Reduced motion ─────────────────────────────────── */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('.rev').forEach(el => { el.style.transition = 'none'; el.classList.add('on'); });
+}
+</script>
+</body>
+</html>
