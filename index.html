@@ -988,6 +988,111 @@
   }
 
   /* ════════════════════════════════════════════════════════════
+     13b. §7b  COMPETITOR COMPARISON — premium value callout
+  ════════════════════════════════════════════════════════════ */
+  .s-compare {
+    background: var(--ink-3);
+    border-top: 1px solid rgba(255,255,255,.05);
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    padding: 14rem 7rem;
+    position: relative; z-index: 1;
+  }
+  .s-compare__inner {
+    max-width: 156rem; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 10rem;
+    align-items: start;
+  }
+  .s-compare__h {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(3.5rem, 4.5vw, 6.5rem);
+    line-height: 1.04; letter-spacing: -.01em;
+    color: var(--cream); margin: 2.4rem 0 3.2rem;
+  }
+  .s-compare__h em { font-style: italic; color: var(--gold); }
+  .s-compare__body {
+    font-size: 1.65rem; font-weight: 300; line-height: 1.84;
+    color: var(--mist); max-width: 44ch;
+  }
+
+  /* Editorial comparison grid — no table */
+  .cmp-grid { width: 100%; }
+  .cmp-grid__head {
+    display: grid;
+    grid-template-columns: 1.6fr 1.2fr 1fr;
+    padding-bottom: 1.6rem;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    font-family: var(--font-brand); font-size: .7rem; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--smoke);
+  }
+  .cmp-grid__row {
+    display: grid;
+    grid-template-columns: 1.6fr 1.2fr 1fr;
+    align-items: center;
+    padding: 2.6rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    position: relative;
+  }
+  .cmp-grid__row--hl::before {
+    content: '';
+    position: absolute; left: -2.8rem; top: 0; bottom: 0;
+    width: 1.5px; background: var(--gold); opacity: .45;
+  }
+  .cmp-name {
+    font-family: var(--font-brand); font-size: .8rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--cream);
+  }
+  .cmp-name em {
+    display: block; font-style: normal;
+    font-family: var(--font-body); font-size: .68rem; font-weight: 300;
+    letter-spacing: 0; text-transform: none; color: var(--smoke); margin-top: .3rem;
+  }
+  .cmp-grid__row--hl .cmp-name { color: var(--gold); }
+  .cmp-price {
+    font-family: var(--font-display); font-size: 2.8rem; font-weight: 500;
+    color: var(--smoke); white-space: nowrap; line-height: 1;
+  }
+  .cmp-grid__row--hl .cmp-price { color: var(--gold); }
+  .cmp-incl { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .cmp-tag {
+    font-family: var(--font-brand); font-size: .62rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--sage);
+    padding: .3rem .75rem;
+    border: 1px solid rgba(122,148,128,.3); background: rgba(122,148,128,.06);
+  }
+  .cmp-dash {
+    font-family: var(--font-brand); font-size: .9rem;
+    color: rgba(112,108,103,.35); letter-spacing: .08em;
+  }
+  .cmp-unconf {
+    font-family: var(--font-brand); font-size: .64rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(112,108,103,.4); line-height: 1.5;
+  }
+  .cmp-loc {
+    font-size: 1.3rem; font-weight: 300; color: var(--smoke);
+  }
+  .compare-footnote {
+    margin-top: 2.8rem;
+    font-family: var(--font-brand); font-size: .7rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--smoke); opacity: .4; line-height: 1.8;
+  }
+  @media (max-width: 1100px) {
+    .s-compare__inner { grid-template-columns: 1fr; gap: 6rem; }
+    .s-compare { padding: 12rem 3.5rem; }
+    .cmp-grid__head,
+    .cmp-grid__row { grid-template-columns: 1.4fr 1.2fr; }
+    .cmp-grid__head span:last-child,
+    .cmp-loc { display: none; }
+  }
+  @media (max-width: 640px) {
+    .s-compare { padding: 8rem 2.4rem; }
+    .cmp-grid__head,
+    .cmp-grid__row { grid-template-columns: 1.6fr 1fr; }
+    .cmp-grid__row--hl::before { left: -1.6rem; }
+  }
+
+  /* ════════════════════════════════════════════════════════════
      14. §8  FINAL CTA
   ════════════════════════════════════════════════════════════ */
   .s-cta {
@@ -995,6 +1100,7 @@
     padding: 17rem 7rem;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,.04);
+    position: relative; z-index: 2;
   }
   .s-cta__inner { max-width: 90rem; margin: 0 auto; }
   .s-cta__h {
@@ -1029,6 +1135,7 @@
     background: var(--ink);
     padding: 14rem 7rem;
     border-top: 1px solid rgba(255,255,255,.04);
+    position: relative; z-index: 2;
   }
   .s-apply__inner { max-width: 96rem; margin: 0 auto; }
   .s-apply__head { text-align: center; margin-bottom: 7rem; }
@@ -1313,6 +1420,7 @@
 <nav class="nav" aria-label="Main navigation">
   <span class="nav__brand">Gradspace</span>
   <div class="nav__links" role="list">
+    <a href="#finder" class="nav__link" role="listitem">Find a Property</a>
     <a href="#collection" class="nav__link" role="listitem">Properties</a>
     <a href="#services"   class="nav__link" role="listitem">Services</a>
     <a href="#why"        class="nav__link" role="listitem">About</a>
@@ -1366,7 +1474,7 @@
       <!-- LINE 2: appears on scroll -->
       <h2 class="s-world__line2" id="wLine2">
         <strong>Gradspace.</strong><br />
-        Live better.
+        Closest to campus.
       </h2>
     </div>
 
@@ -1378,6 +1486,454 @@
 
   </div>
 </section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §5c  SMART MATCH — interactive property finder
+══════════════════════════════════════════════════════════ -->
+
+<!-- ── Lightbox ────────────────────────────────────────────── -->
+<div id="gsLightbox" role="dialog" aria-modal="true" aria-label="Property photo gallery" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(8,8,7,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;">
+  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:2.4rem 3.2rem;z-index:2;">
+    <div>
+      <div id="gsLbTitle" style="font-family:var(--font-brand);font-size:.8rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--cream);"></div>
+      <div id="gsLbCounter" style="font-family:var(--font-brand);font-size:.72rem;font-weight:600;letter-spacing:.18em;color:var(--smoke);margin-top:.3rem;"></div>
+    </div>
+    <button id="gsLbClose" aria-label="Close gallery" style="font-family:var(--font-brand);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);background:none;border:1px solid rgba(255,255,255,.12);padding:.7rem 1.6rem;cursor:pointer;transition:all .2s;">✕ Close</button>
+  </div>
+  <div style="position:relative;width:100%;max-width:96rem;max-height:80vh;display:flex;align-items:center;justify-content:center;padding:0 7rem;">
+    <button id="gsLbPrev" aria-label="Previous photo" style="position:absolute;left:1.6rem;width:4.8rem;height:4.8rem;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.15);background:rgba(11,11,10,.6);color:var(--cream);cursor:pointer;transition:all .2s;flex-shrink:0;">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="none" aria-hidden="true"><path d="M15 7H2M8 1L2 7l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div style="width:100%;max-height:80vh;overflow:hidden;position:relative;">
+      <img id="gsLbImg" src="" alt="" style="width:100%;max-height:80vh;object-fit:contain;display:block;transition:opacity .25s;" />
+    </div>
+    <button id="gsLbNext" aria-label="Next photo" style="position:absolute;right:1.6rem;width:4.8rem;height:4.8rem;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.15);background:rgba(11,11,10,.6);color:var(--cream);cursor:pointer;transition:all .2s;flex-shrink:0;">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="none" aria-hidden="true"><path d="M1 7h13M8 1l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <!-- Thumbnail strip -->
+  <div id="gsLbThumbs" style="display:flex;gap:.6rem;overflow-x:auto;padding:2rem 3.2rem 0;scrollbar-width:none;max-width:96rem;width:100%;"></div>
+</div>
+
+<style>
+/* ── Smart Match ─────────────────────────────────────────── */
+.s-finder { background: var(--ink-2); border-top: 1px solid rgba(255,255,255,.04); padding: 5rem 0 7rem; }
+.sf-inner { max-width: 160rem; margin: 0 auto; padding: 0 6.4rem; }
+
+/* Header row */
+.sf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4.5rem; }
+.sf-label { font-family: var(--font-brand); font-size: .78rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--smoke); }
+.sf-reset { font-family: var(--font-brand); font-size: .78rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); background: none; border: 1px solid rgba(255,255,255,.08); padding: .7rem 1.6rem; cursor: pointer; transition: color .2s, border-color .2s; }
+.sf-reset:hover { color: var(--cream); border-color: rgba(255,255,255,.24); }
+
+/* Layout */
+.sf-layout { display: grid; grid-template-columns: 26rem 1fr; gap: 5rem; align-items: start; }
+
+/* Filter panel */
+.sf-panel { display: flex; flex-direction: column; gap: 3.8rem; }
+.sf-group__label { font-family: var(--font-brand); font-size: .72rem; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--smoke); margin-bottom: 1.4rem; }
+
+/* Budget */
+.sf-budget-val { display: block; font-family: var(--font-brand); font-size: .9rem; font-weight: 600; color: var(--gold); margin-bottom: 1rem; }
+.sf-range { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,.1); outline: none; border-radius: 2px; cursor: pointer; }
+.sf-range::-webkit-slider-thumb { -webkit-appearance: none; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--gold); cursor: pointer; border: 2px solid var(--ink-2); transition: transform .2s; }
+.sf-range::-webkit-slider-thumb:hover { transform: scale(1.25); }
+.sf-range::-moz-range-thumb { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--gold); cursor: pointer; border: 2px solid var(--ink-2); }
+
+/* Distance pills */
+.sf-pills { display: flex; gap: .8rem; flex-wrap: wrap; }
+.sf-pill { font-family: var(--font-brand); font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: .75rem 1.4rem; border: 1px solid rgba(255,255,255,.12); color: var(--smoke); background: none; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.sf-pill:hover { border-color: rgba(255,255,255,.32); color: var(--mist); }
+.sf-pill--on { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+.sf-pill--on:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+/* Feature toggles */
+.sf-toggles { display: flex; flex-direction: column; gap: .7rem; }
+.sf-toggle { display: flex; align-items: center; gap: 1rem; font-family: var(--font-brand); font-size: .75rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--smoke); background: none; border: 1px solid rgba(255,255,255,.07); padding: .9rem 1.4rem; cursor: pointer; text-align: left; transition: all .2s; }
+.sf-toggle svg { width: 1.4rem; height: 1.4rem; flex-shrink: 0; opacity: .5; transition: opacity .2s; }
+.sf-toggle:hover { border-color: rgba(255,255,255,.2); color: var(--mist); }
+.sf-toggle:hover svg { opacity: .8; }
+.sf-toggle--on { border-color: rgba(201,169,110,.4); color: var(--gold); background: rgba(201,169,110,.06); }
+.sf-toggle--on svg { opacity: 1; color: var(--gold); }
+
+/* Results area */
+.sf-results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.4rem; }
+.sf-results-label { font-family: var(--font-brand); font-size: .78rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--smoke); }
+.sf-arrows { display: flex; gap: .6rem; }
+.sf-arrow { width: 3.6rem; height: 3.6rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.1); background: none; cursor: pointer; transition: all .2s; color: var(--mist); }
+.sf-arrow:hover { border-color: rgba(255,255,255,.3); color: var(--cream); }
+.sf-arrow:disabled { opacity: .25; cursor: default; }
+
+/* Carousel */
+.sf-track-wrap { overflow: hidden; }
+.sf-track { display: flex; gap: 1.6rem; transition: transform .5s cubic-bezier(0.25,1,0.5,1); }
+
+/* Property card */
+.sf-card { flex: 0 0 calc(33.333% - 1.1rem); background: var(--ink-3); position: relative; cursor: pointer; transition: transform .3s var(--ease); }
+.sf-card:hover { transform: translateY(-3px); }
+/* Card photo — single hero image */
+.sf-card__hero { position: relative; aspect-ratio: 3/2; overflow: hidden; background: var(--ink-3); cursor: zoom-in; }
+.sf-card__hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.82) contrast(1.05) saturate(.9); transition: transform .6s var(--ease), filter .3s; }
+.sf-card:hover .sf-card__hero img { transform: scale(1.04); filter: brightness(.9) contrast(1.04) saturate(.95); }
+.sf-card__match { position: absolute; top: 1.2rem; left: 1.2rem; z-index: 2; font-family: var(--font-brand); font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; background: rgba(11,11,10,.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.1); color: var(--cream); padding: .4rem .9rem; }
+.sf-card__count { position: absolute; bottom: 1.2rem; right: 1.2rem; z-index: 2; font-family: var(--font-brand); font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; background: rgba(11,11,10,.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.1); color: rgba(242,237,230,.7); padding: .4rem .9rem; display: flex; align-items: center; gap: .5rem; pointer-events: none; }
+.sf-card__count svg { width: 1.1rem; height: 1.1rem; opacity: .7; }
+.sf-card__body { padding: 2rem 2.2rem 2.4rem; }
+.sf-card__num { font-family: var(--font-brand); font-size: .65rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--smoke); margin-bottom: .6rem; }
+.sf-card__name { font-family: var(--font-display); font-weight: 500; font-size: 2.2rem; color: var(--cream); line-height: 1.1; margin-bottom: .6rem; }
+.sf-card__price { font-family: var(--font-brand); font-size: .8rem; font-weight: 600; color: var(--gold); letter-spacing: .04em; margin-bottom: 1.4rem; }
+.sf-card__tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.sf-card__tag { font-family: var(--font-brand); font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--smoke); border: 1px solid rgba(255,255,255,.07); padding: .35rem .8rem; }
+.sf-card__link { display: inline-flex; align-items: center; gap: .7rem; font-family: var(--font-brand); font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); transition: color .2s; }
+.sf-card__link svg { width: 1.2rem; height: .9rem; transition: transform .2s; }
+.sf-card:hover .sf-card__link { color: var(--cream); }
+.sf-card:hover .sf-card__link svg { transform: translateX(3px); }
+
+/* No results */
+.sf-no-match { font-family: var(--font-brand); font-size: .9rem; color: var(--smoke); letter-spacing: .1em; padding: 4rem 0; text-align: center; }
+
+/* Responsive */
+@media (max-width: 1100px) { .sf-layout { grid-template-columns: 22rem 1fr; gap: 3.5rem; } .sf-card { flex: 0 0 calc(50% - .8rem); } }
+@media (max-width: 768px) {
+  .sf-inner { padding: 0 3.5rem; }
+  .sf-layout { grid-template-columns: 1fr; }
+  .sf-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; }
+  .sf-card { flex: 0 0 calc(100% - 0px); }
+}
+@media (max-width: 480px) { .sf-inner { padding: 0 2.4rem; } .sf-panel { grid-template-columns: 1fr; } }
+</style>
+
+<section class="s-finder" id="finder" aria-label="Property finder">
+  <div class="sf-inner">
+
+    <div class="sf-header">
+      <span class="sf-label">(Smart Match)</span>
+      <button class="sf-reset" id="sfReset">Reset</button>
+    </div>
+
+    <div class="sf-layout">
+
+      <!-- ── Filter panel ─────────────────────────────────── -->
+      <div class="sf-panel">
+
+        <div class="sf-group">
+          <div class="sf-group__label">Distance</div>
+          <div class="sf-pills">
+            <button class="sf-pill sf-pill--on" data-dist="any">Any</button>
+            <button class="sf-pill" data-dist="5">&lt;5 min walk</button>
+            <button class="sf-pill" data-dist="10">5–10 min</button>
+          </div>
+        </div>
+
+        <div class="sf-group">
+          <div class="sf-group__label">Includes</div>
+          <div class="sf-toggles">
+            <button class="sf-toggle" data-feat="wifi">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+              Wi-Fi
+            </button>
+            <button class="sf-toggle" data-feat="water">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+              Water incl.
+            </button>
+            <button class="sf-toggle" data-feat="dishwasher">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M12 8v1m0 6v1m-4-4h1m6 0h1"/></svg>
+              Dishwasher
+            </button>
+            <button class="sf-toggle" data-feat="laundry">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 7h.01M10 7h3"/></svg>
+              Laundry
+            </button>
+            <button class="sf-toggle" data-feat="security">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Armed security
+            </button>
+            <button class="sf-toggle" data-feat="cleaning">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+              Cleaning incl.
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /sf-panel -->
+
+      <!-- ── Results panel ─────────────────────────────────── -->
+      <div class="sf-results">
+        <div class="sf-results-header">
+          <span class="sf-results-label">Top Matches</span>
+          <div class="sf-arrows">
+            <button class="sf-arrow sf-arrow--prev" id="sfPrev" aria-label="Previous properties">
+              <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M14 6H2M7 1L2 6l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="sf-arrow sf-arrow--next" id="sfNext" aria-label="Next properties">
+              <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M0 6h12M7 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="sf-track-wrap">
+          <div class="sf-track" id="sfTrack"></div>
+        </div>
+        <p class="sf-no-match" id="sfNoMatch" hidden>No properties match — try adjusting your filters.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+/* ── Smart Match ─────────────────────────────────────────── */
+(function () {
+
+  const PROPS = [
+    {
+      id: 'factory', name: 'The Factory', num: '01',
+      dist: 3, distLabel: '3 min walk',
+      link: 'factory.html',
+      features: ['wifi','water','security'],
+      tags: ['3 min walk','Wi-Fi incl.','Water incl.'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-010-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-019-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-037-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-054-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-066-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-102719-2282-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103055-2291-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103215-2292-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103304-2295-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103357-2297-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103708-2302-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103723-2303-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-103811-2306-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-104001-2312-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-104045-2314-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-104308-2321-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-105058-2325-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-105145-2327-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-105455-2339-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-110634-2349-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-110734-2354-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-110814-2357-510-3x2-1.jpg',
+      ]
+    },
+    {
+      id: 'union', name: 'Union House', num: '02',
+      dist: 5, distLabel: '5 min walk',
+      link: 'union.html',
+      features: ['wifi','water','dishwasher','laundry','security'],
+      tags: ['5 min walk','Wi-Fi incl.','Water incl.'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/unionhouse-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-107-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-139-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-111502-2362-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-111630-2366-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-111722-2368-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-111821-2371-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-111913-2373-HDR-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112024-2376-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112111-2379-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112143-2380-HDR-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112231-2382-HDR-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112304-2386-HDR-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112342-2387-510-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Interior-20210115-112547-2392-510-3x2-1.jpg',
+      ]
+    },
+    {
+      id: 'jonkerzicht', name: 'Jonkerzicht', num: '03',
+      dist: 8, distLabel: '8 min walk',
+      link: 'jonkerzicht.html',
+      features: ['wifi','security'],
+      tags: ['8 min walk','Wi-Fi incl.'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Jonkerzicht-800-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-House-20201201-20201201-160215-0023-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-House-20201201-20201201-160347-0033-Edit-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-House-20201201-20201201-160501-0036-800-Gallery.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-House-20201201-20201201-160605-0048-800-Gallery.jpg',
+      ]
+    },
+    {
+      id: 'bergzicht', name: 'Bergzicht 63', num: '04',
+      dist: 6, distLabel: '6 min walk',
+      link: 'bergzicht.html',
+      features: ['wifi'],
+      tags: ['6 min walk','Wi-Fi incl.'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Bergzicht-63-20.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-Bergzicht-63-01.jpg',
+      ]
+    },
+    {
+      id: 'akkerhof', name: 'Akkerhof', num: '05',
+      dist: 4, distLabel: '4 min walk',
+      link: 'akkerhof.html',
+      features: ['wifi','water','laundry'],
+      tags: ['4 min walk','Wi-Fi incl.','Laundry'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-The-Akkerhof-01-512-400x250-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-The-Akkerhof-02-512-400x250-1.jpg',
+      ]
+    },
+    {
+      id: 'vineyards', name: 'The Vineyards', num: '06',
+      dist: 20, distLabel: '2.9 km',
+      link: 'vineyards.html',
+      features: ['wifi','water'],
+      tags: ['2.9 km','Wi-Fi incl.','Water incl.'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-The-Vineyards-02.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-The-Vineyards-01.jpg',
+      ]
+    },
+    {
+      id: 'cluver', name: '24 Cluver Road', num: '07',
+      dist: 5, distLabel: '5 min walk',
+      link: 'cluver.html',
+      features: ['wifi','water','laundry'],
+      tags: ['5 min walk','Wi-Fi incl.','Laundry'],
+      photos: [
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-02-800-3x2-1.jpg',
+        'https://gradspace.co.za/wp-content/uploads/Gradspace-24-Cluver-Road-01-800-3x2-1.jpg',
+      ]
+    },
+  ];
+
+  /* State */
+  let distMax  = Infinity;
+  let reqFeats = new Set();
+  let offset   = 0;  /* carousel index */
+  let visible  = [];
+  let cardsPerView = 3;
+
+  /* Elements */
+  const track      = document.getElementById('sfTrack');
+  const noMatch    = document.getElementById('sfNoMatch');
+  const prevBtn    = document.getElementById('sfPrev');
+  const nextBtn    = document.getElementById('sfNext');
+  const resetBtn   = document.getElementById('sfReset');
+
+  function getCardsPerView() {
+    if (window.innerWidth <= 768) return 1;
+    if (window.innerWidth <= 1100) return 2;
+    return 3;
+  }
+
+  function buildCard(p, rank) {
+    const tagsHTML = p.tags.map(t => `<span class="sf-card__tag">${t}</span>`).join('');
+
+    const card = document.createElement('div');
+    card.className = 'sf-card';
+    card.innerHTML = `
+      <div class="sf-card__hero" role="button" tabindex="0" aria-label="View ${p.photos.length} photos of ${p.name}">
+        <img src="${p.photos[0]}" alt="${p.name} — main photo" loading="eager" />
+        <span class="sf-card__match">Match ${rank}</span>
+        <span class="sf-card__count">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="6" width="20" height="15" rx="2"/><path d="M16 2l-4 4-4-4"/><circle cx="12" cy="13" r="3"/></svg>
+          ${p.photos.length} photos
+        </span>
+      </div>
+      <div class="sf-card__body">
+        <p class="sf-card__num">${p.num} — ${p.distLabel}</p>
+        <h3 class="sf-card__name">${p.name}</h3>
+        <div class="sf-card__tags">${tagsHTML}</div>
+        <a href="${p.link}" class="sf-card__link" aria-label="Go to ${p.name} property page">
+          View details
+          <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7.5 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>`;
+
+    /* Open lightbox when clicking the photo area */
+    const hero = card.querySelector('.sf-card__hero');
+    hero.addEventListener('click', () => openLightbox(p, 0));
+    hero.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(p, 0); } });
+    return card;
+  }
+
+  function scoreMatch(p) {
+    /* Count how many required features this property has */
+    let hits = 0;
+    reqFeats.forEach(f => { if (p.features.includes(f)) hits++; });
+    return hits;
+  }
+
+  function render() {
+    cardsPerView = getCardsPerView();
+    offset = 0;
+
+    /* Filter */
+    visible = PROPS.filter(p => {
+      if (p.dist > distMax) return false;
+      for (const f of reqFeats) { if (!p.features.includes(f)) return false; }
+      return true;
+    });
+
+    /* Sort by feature match score descending */
+    visible.sort((a, b) => {
+      const sa = scoreMatch(a), sb = scoreMatch(b);
+      return sb - sa;
+    });
+
+    track.innerHTML = '';
+    if (visible.length === 0) {
+      noMatch.hidden = false;
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      return;
+    }
+    noMatch.hidden = true;
+
+    visible.forEach((p, i) => track.appendChild(buildCard(p, i + 1)));
+    updateCarousel();
+  }
+
+  function updateCarousel() {
+    const cardW = track.firstChild ? track.firstChild.offsetWidth + 16 : 0;
+    track.style.transform = `translateX(-${offset * cardW}px)`;
+    prevBtn.disabled = offset <= 0;
+    nextBtn.disabled = offset >= visible.length - cardsPerView;
+  }
+
+  /* Events */
+  document.querySelectorAll('.sf-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sf-pill').forEach(b => b.classList.remove('sf-pill--on'));
+      btn.classList.add('sf-pill--on');
+      const d = btn.dataset.dist;
+      distMax = d === 'any' ? Infinity : d === '5' ? 5 : 10;
+      render();
+    });
+  });
+
+  document.querySelectorAll('.sf-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.feat;
+      if (reqFeats.has(f)) { reqFeats.delete(f); btn.classList.remove('sf-toggle--on'); }
+      else                  { reqFeats.add(f);    btn.classList.add('sf-toggle--on');    }
+      render();
+    });
+  });
+
+  prevBtn.addEventListener('click', () => { if (offset > 0) { offset--; updateCarousel(); } });
+  nextBtn.addEventListener('click', () => { if (offset < visible.length - cardsPerView) { offset++; updateCarousel(); } });
+
+  resetBtn.addEventListener('click', () => {
+    distMax = Infinity;
+    document.querySelectorAll('.sf-pill').forEach(b => b.classList.remove('sf-pill--on'));
+    document.querySelector('.sf-pill[data-dist="any"]').classList.add('sf-pill--on');
+    reqFeats.clear();
+    document.querySelectorAll('.sf-toggle').forEach(b => b.classList.remove('sf-toggle--on'));
+    render();
+  });
+
+  window.addEventListener('resize', () => { cardsPerView = getCardsPerView(); updateCarousel(); });
+
+  /* Init */
+  render();
+})();
+</script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -1428,10 +1984,11 @@
           <!-- ⚡ UPDATE: swap text above when 2026 status confirmed -->
           <h2 class="flagship-name">The Factory</h2>
           <p class="flagship-identity">
-            4,000m² purpose-built across four storeys. Twelve apartments,
-            each designed for groups of three to six — private en-suite
-            rooms, shared living and kitchen, and a braai deck to come
-            home to.
+            4,000m² purpose-built in Universiteits Oord — the private
+            residential quarter directly alongside Stellenbosch University's
+            main gate. Twelve apartments across four storeys, each with
+            private en-suite rooms, shared kitchen and living areas, and a
+            braai deck. Uncapped Wi-Fi and water included in your base rate.
           </p>
           <div class="flagship-facts">
             <div class="flagship-fact">
@@ -1694,6 +2251,89 @@
 </section>
 
 
+<script>
+/* ── Lightbox ────────────────────────────────────────────── */
+(function () {
+  const lb      = document.getElementById('gsLightbox');
+  const lbImg   = document.getElementById('gsLbImg');
+  const lbTitle = document.getElementById('gsLbTitle');
+  const lbCount = document.getElementById('gsLbCounter');
+  const lbPrev  = document.getElementById('gsLbPrev');
+  const lbNext  = document.getElementById('gsLbNext');
+  const lbClose = document.getElementById('gsLbClose');
+  const lbThumbs= document.getElementById('gsLbThumbs');
+
+  let photos = [], idx = 0, propName = '';
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, photos.length - 1));
+    lbImg.style.opacity = '0';
+    setTimeout(() => {
+      lbImg.src = photos[idx];
+      lbImg.alt = `${propName} — photo ${idx + 1} of ${photos.length}`;
+      lbImg.style.opacity = '1';
+    }, 120);
+    lbCount.textContent = `${String(idx + 1).padStart(2,'0')} / ${String(photos.length).padStart(2,'0')}`;
+    lbPrev.disabled = idx === 0;
+    lbNext.disabled = idx === photos.length - 1;
+    /* Highlight active thumb */
+    lbThumbs.querySelectorAll('button').forEach((b, i) => {
+      b.style.opacity = i === idx ? '1' : '0.35';
+      b.style.outline = i === idx ? '1px solid rgba(201,169,110,.7)' : 'none';
+    });
+    lbThumbs.querySelectorAll('button')[idx]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  window.openLightbox = function (prop, startIdx) {
+    photos   = prop.photos;
+    propName = prop.name;
+    lbTitle.textContent = prop.name;
+
+    /* Build thumbnail strip */
+    lbThumbs.innerHTML = '';
+    photos.forEach((src, i) => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'flex-shrink:0;width:7.2rem;height:5rem;overflow:hidden;background:var(--ink-3);border:none;padding:0;cursor:pointer;position:relative;';
+      btn.setAttribute('aria-label', `View photo ${i+1}`);
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+      btn.appendChild(img);
+      btn.addEventListener('click', () => show(i));
+      lbThumbs.appendChild(btn);
+    });
+
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    show(startIdx || 0);
+    lbClose.focus();
+  };
+
+  function closeLightbox() {
+    lb.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click',  () => show(idx - 1));
+  lbNext.addEventListener('click',  () => show(idx + 1));
+
+  /* Click outside image closes */
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+
+  /* Keyboard */
+  document.addEventListener('keydown', e => {
+    if (lb.style.display === 'none') return;
+    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'ArrowLeft')  show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+})();
+</script>
+
+
 <!-- ══════════════════════════════════════════════════════════
      §5b  SERVICES & INCLUSIONS
      ────────────────────────────────────────────────────────
@@ -1708,10 +2348,35 @@
       <span class="eyebrow eyebrow--gold rev">What's Included</span>
       <h2 class="s-services__h rev d1">Everything covered.<br /><em>Move in. Settle in.</em></h2>
       <p class="s-services__sub rev d2">
-        Every Gradspace rental comes with a core set of essentials —
-        no hidden costs, no separate bills to juggle.
-        Your space, fully supported from day one.
+        Every Gradspace rental includes uncapped Wi-Fi and water in the base rate —
+        essentials that comparable properties often bill separately.
+        No hidden costs. No utility juggling. Move in, settle in.
       </p>
+    </div>
+
+    <!-- WiFi + Water competitive callout -->
+    <div class="incl-flag rev d2" style="
+      display:flex; align-items:flex-start; gap:2.8rem;
+      padding:3.2rem 3.6rem; margin-bottom:3.2rem;
+      background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,rgba(122,148,128,.06) 100%);
+      border:1px solid rgba(201,169,110,.22); border-radius:.4rem;
+    ">
+      <div style="display:flex;gap:1.2rem;flex-shrink:0;margin-top:.2rem;" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z"/>
+        </svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"/>
+        </svg>
+      </div>
+      <div>
+        <p style="font-family:var(--font-brand);font-size:.82rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;">WiFi + Water — Included in Base Rent</p>
+        <p style="font-size:1.42rem;font-weight:300;line-height:1.72;color:var(--mist);">
+          Uncapped fibre internet and municipal water are both covered by your monthly rental across Gradspace properties.
+          <span style="color:var(--cream);font-weight:500;">No separate utility bills. No add-ons. No surprises.</span>
+          At comparable student properties in Stellenbosch, these are often charged on top of rent.
+        </p>
+      </div>
     </div>
 
     <div class="inclusions-grid">
@@ -1720,8 +2385,8 @@
         <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <path d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h4 class="inclusion-title">Uncapped Wi-Fi</h4>
-        <p class="inclusion-desc">Uncapped fibre internet included in your monthly rental. Study, stream, connect — no data caps, no extra charge.</p>
+        <h4 class="inclusion-title">Uncapped Wi-Fi — Included</h4>
+        <p class="inclusion-desc">Uncapped fibre internet included in your base rent. Study, stream, connect — no data caps, no extra charge, no separate bill.</p>
       </div>
 
       <div class="inclusion-card">
@@ -1736,8 +2401,8 @@
         <svg class="inclusion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <path d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h4 class="inclusion-title">Water &amp; Rates</h4>
-        <p class="inclusion-desc">Municipal water and all property rates are included. Nothing extra to budget for on top of your monthly rental.</p>
+        <h4 class="inclusion-title">Water — Included</h4>
+        <p class="inclusion-desc">Municipal water covered in your base rent. Nothing extra to budget for — no separate account, no variable bill.</p>
       </div>
 
       <div class="inclusion-card">
@@ -1934,17 +2599,18 @@
   <div class="lifestyle-block">
     <div class="lifestyle-block__text">
       <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">01 — Location</span>
-      <h3 class="lifestyle-h rev d1">Your campus,<br /><em>on foot.</em></h3>
+      <h3 class="lifestyle-h rev d1">The closest private<br /><em>address to campus.</em></h3>
       <p class="lifestyle-body rev d2">
-        Every Gradspace address was chosen for its relationship to
-        Stellenbosch University. Most are within a five-minute walk
-        of the main gate — no transport, no planning. Just your
-        door, and then campus.
+        Gradspace properties cluster in Universiteits Oord — the private
+        residential quarter that sits directly alongside Stellenbosch
+        University's main gate. No Gradspace tenant has further to walk
+        than any other private resident in Stellenbosch. No transport,
+        no planning. Just your front door, and then lecture halls.
       </p>
       <div class="lifestyle-stats rev d3">
-        <span class="lifestyle-stat">~5 min walk to campus</span>
-        <span class="lifestyle-stat">Seven premium addresses</span>
-        <span class="lifestyle-stat">Universiteits Oord &amp; surrounds</span>
+        <span class="lifestyle-stat">Universiteits Oord — directly alongside SU</span>
+        <span class="lifestyle-stat">~5 min walk to the main gate</span>
+        <span class="lifestyle-stat">Closest private provider to campus</span>
       </div>
     </div>
     <div class="lifestyle-block__image" aria-hidden="true">
@@ -1957,42 +2623,90 @@
     </div>
   </div>
 
-  <!-- Block 2: image left, text right -->
+  <!-- Block 2: image left, text right — SAFETY -->
   <div class="lifestyle-block">
     <div class="lifestyle-block__image" aria-hidden="true">
+      <!--
+        ⚡ ASSET SLOT — Safety block
+        Target: Banghoek Quarter streetscape, or gated entrance at dusk.
+        Mood: calm, secure, residential. NOT a crime-prevention photo.
+      -->
       <div class="lifestyle-img-wrap">
         <img class="lifestyle-img"
           src="home-entrance.jpg"
-          alt="Premium home entrance — modern architecture, warm light"
+          alt="Gradspace property entrance — secure, quiet residential neighbourhood"
           loading="lazy" />
       </div>
     </div>
     <div class="lifestyle-block__text">
-      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">02 — Living Standard</span>
-      <h3 class="lifestyle-h rev d1">A home worth<br /><em>coming back to.</em></h3>
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">02 — Safety</span>
+      <h3 class="lifestyle-h rev d1">The safest quarter<br /><em>in Stellenbosch.</em></h3>
       <p class="lifestyle-body rev d2">
-        Communal areas serviced three times a week. Fibre Wi-Fi
-        included. Maintenance handled by people who show up. Your
-        focus stays where it belongs — entirely on your degree.
+        Gradspace addresses sit in Universiteits Oord and the Banghoek
+        Quarter — consistently the safest residential zones in Stellenbosch.
+        This matters more than most landlords will tell you. For students
+        and families making a decision from far away, where you live is
+        as important as how you live. We chose these streets deliberately.
+        Every one of them.
       </p>
       <div class="lifestyle-stats rev d3">
-        <span class="lifestyle-stat">3× weekly communal cleaning</span>
-        <span class="lifestyle-stat">Uncapped fibre Wi-Fi included</span>
-        <span class="lifestyle-stat">24-hr armed response at select properties</span>
+        <span class="lifestyle-stat">Banghoek Quarter — lowest incident zone</span>
+        <span class="lifestyle-stat">24-hr armed response at The Factory &amp; Union House</span>
+        <span class="lifestyle-stat">No Idas Valley. No Cloetesville.</span>
       </div>
     </div>
   </div>
 
-  <!-- Block 3: text left, image right -->
+  <!-- Block 3: text left, image right — LIVING STANDARD -->
   <div class="lifestyle-block">
     <div class="lifestyle-block__text">
-      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">03 — The Town</span>
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">03 — Living Standard</span>
+      <h3 class="lifestyle-h rev d1">A home worth<br /><em>coming back to.</em></h3>
+      <p class="lifestyle-body rev d2">
+        Communal areas serviced three times a week. Uncapped fibre Wi-Fi
+        and water included in your base rate. Maintenance handled by people
+        who actually show up. Your focus stays where it belongs — entirely
+        on your degree.
+      </p>
+      <div class="lifestyle-stats rev d3">
+        <span class="lifestyle-stat">3× weekly communal cleaning</span>
+        <span class="lifestyle-stat">Uncapped fibre Wi-Fi + water included</span>
+        <span class="lifestyle-stat">24-hr armed response at select properties</span>
+      </div>
+    </div>
+    <div class="lifestyle-block__image" aria-hidden="true">
+      <div class="lifestyle-img-wrap">
+        <img class="lifestyle-img"
+          src="town-stellenbosch.jpg"
+          alt="Premium student living — warm, well-appointed communal spaces"
+          loading="lazy" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Block 4: image left, text right — THE TOWN -->
+  <div class="lifestyle-block">
+    <div class="lifestyle-block__image" aria-hidden="true">
+      <!--
+        ⚡ ASSET SLOT — The Town block
+        Target: Oak-lined Dorp Street or vineyard at golden hour.
+        Mood: wide, aspirational, editorial quality.
+      -->
+      <div class="lifestyle-img-wrap">
+        <img class="lifestyle-img"
+          src="su-campus.jpg"
+          alt="Stellenbosch — oak-lined streets, Cape Dutch architecture"
+          loading="lazy" />
+      </div>
+    </div>
+    <div class="lifestyle-block__text">
+      <span class="eyebrow eyebrow--gold lifestyle-eyebrow rev">04 — The Town</span>
       <h3 class="lifestyle-h rev d1">Stellenbosch<br /><em>is the reason.</em></h3>
       <p class="lifestyle-body rev d2">
-        Wine country. Mountain backdrops. Oak-lined streets built
-        around one of Africa's great universities. You're not just
-        choosing a room — you're choosing South Africa's finest
-        student town.
+        Wine country. Mountain backdrops. Oak-lined streets built around
+        one of Africa's great universities. You're not just choosing a
+        room — you're choosing South Africa's finest student town, in
+        the neighbourhood with the best address it has to offer.
       </p>
       <div class="lifestyle-stats rev d3">
         <span class="lifestyle-stat">Western Cape, South Africa</span>
@@ -2000,16 +2714,80 @@
         <span class="lifestyle-stat">World-class wine estates</span>
       </div>
     </div>
-    <div class="lifestyle-block__image" aria-hidden="true">
-      <div class="lifestyle-img-wrap">
-        <img class="lifestyle-img"
-          src="town-stellenbosch.jpg"
-          alt="Stellenbosch — oak-lined streets, Cape Dutch architecture"
-          loading="lazy" />
-      </div>
-    </div>
   </div>
 
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     §7b  COMPETITOR COMPARISON — premium value callout
+══════════════════════════════════════════════════════════ -->
+<section class="s-compare" aria-label="Market pricing comparison">
+  <div class="s-compare__inner">
+
+    <div>
+      <span class="eyebrow eyebrow--gold rev">The Market · Honest Numbers</span>
+      <h2 class="s-compare__h rev d1">
+        More included.<br /><em>No add-ons.</em>
+      </h2>
+      <p class="s-compare__body rev d2">
+        The Factory already includes uncapped Wi-Fi and water in your base rental.
+        No hidden utilities, no separate bills. At comparable Stellenbosch properties,
+        these are either billed separately or excluded entirely.
+      </p>
+    </div>
+
+    <div class="rev d2">
+      <div class="cmp-grid" role="table" aria-label="Pricing comparison with Stellenbosch competitors">
+
+        <!-- Column headers -->
+        <div class="cmp-grid__head" role="row">
+          <span>Property</span>
+          <span>Includes</span>
+          <span>Area</span>
+        </div>
+
+        <!-- The Factory — Gradspace (highlighted) -->
+        <div class="cmp-grid__row cmp-grid__row--hl" role="row">
+          <div class="cmp-name" role="cell">
+            The Factory
+            <em>Gradspace</em>
+          </div>
+          <div class="cmp-incl" role="cell">
+            <span class="cmp-tag">Wi-Fi</span>
+            <span class="cmp-tag">Water</span>
+          </div>
+          <div class="cmp-loc" role="cell">Universiteits Oord</div>
+        </div>
+
+        <!-- CampusKey Platinum -->
+        <div class="cmp-grid__row" role="row">
+          <div class="cmp-name" role="cell">CampusKey Platinum</div>
+          <div class="cmp-incl" role="cell">
+            <span class="cmp-dash">—</span>
+            <span class="cmp-unconf">Not confirmed</span>
+          </div>
+          <div class="cmp-loc" role="cell">Banghoek</div>
+        </div>
+
+        <!-- 27Cluver -->
+        <div class="cmp-grid__row" role="row">
+          <div class="cmp-name" role="cell">27Cluver</div>
+          <div class="cmp-incl" role="cell">
+            <span class="cmp-dash">—</span>
+            <span class="cmp-unconf">Not confirmed</span>
+          </div>
+          <div class="cmp-loc" role="cell">Central</div>
+        </div>
+
+      </div>
+      <p class="compare-footnote rev d3">
+        The Factory: Wi-Fi &amp; water included in base rental — no separate utility bills.
+        CampusKey Platinum and 27Cluver: inclusions unconfirmed. Verify direct with providers.
+      </p>
+    </div>
+
+  </div>
 </section>
 
 
@@ -2475,7 +3253,7 @@ document.querySelectorAll('.rev').forEach(el => revIO.observe(el));
   if (!mapEl || typeof L === 'undefined') return;
 
   const map = L.map('gradspaceMap', {
-    center: [-33.932, 18.864],
+    center: [-33.9316, 18.868],
     zoom: 14,
     zoomControl: false,
     scrollWheelZoom: false,
@@ -2510,13 +3288,13 @@ document.querySelectorAll('.rev').forEach(el => revIO.observe(el));
   }
 
   const properties = [
-    { num: '01', name: 'The Factory',    coords: [-33.9278, 18.8598], href: 'factory.html' },
-    { num: '02', name: 'Union House',    coords: [-33.9273, 18.8605], href: 'https://gradspace.co.za/unit/union-house/' },
-    { num: '03', name: 'Jonkerzicht',    coords: [-33.9366, 18.8672], href: 'jonkerzicht.html' },
-    { num: '04', name: 'Bergzicht 63',   coords: [-33.9330, 18.8555], href: 'bergzicht.html' },
-    { num: '05', name: 'Akkerhof',       coords: [-33.9352, 18.8688], href: 'akkerhof.html' },
-    { num: '06', name: 'The Vineyards',  coords: [-33.9015, 18.8745], href: 'vineyards.html' },
-    { num: '07', name: '24 Cluver Road', coords: [-33.9385, 18.8625], href: 'cluver.html' },
+    { num: '01', name: 'The Factory',    coords: [-33.929666, 18.868669], href: 'factory.html' },
+    { num: '02', name: 'Union House',    coords: [-33.929631, 18.869492], href: 'https://gradspace.co.za/unit/union-house/' },
+    { num: '03', name: 'Jonkerzicht',    coords: [-33.9301066, 18.8762815], href: 'jonkerzicht.html' },
+    { num: '04', name: 'Bergzicht 63',   coords: [-33.9347257, 18.8551893], href: 'bergzicht.html' },
+    { num: '05', name: 'Akkerhof',       coords: [-33.9310553, 18.8577264], href: 'akkerhof.html' },
+    { num: '06', name: 'The Vineyards',  coords: [-33.9182498, 18.8835691], href: 'vineyards.html' },
+    { num: '07', name: '24 Cluver Road', coords: [-33.9276656, 18.8763938], href: 'cluver.html' },
   ];
 
   properties.forEach(({ num, name, coords, href }) => {
