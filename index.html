@@ -3254,13 +3254,36 @@ document.querySelectorAll('.rev').forEach(el => revIO.observe(el));
 
   const map = L.map('gradspaceMap', {
     center: [-33.9316, 18.868],
-    zoom: 14,
+    zoom: 15,
     zoomControl: false,
     scrollWheelZoom: false,
     attributionControl: true
   });
 
   L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  // invalidateSize() when the .rev animation reveals the map container,
+  // otherwise Leaflet initialises inside a CSS-transformed element and
+  // tiles/markers render at the wrong offsets on every zoom step.
+  var mapWrapper = mapEl.closest('.map-interactive') || mapEl.parentElement;
+  if (mapWrapper) {
+    mapWrapper.addEventListener('transitionend', function fixSize(ev) {
+      if (ev.target === mapWrapper) {
+        map.invalidateSize();
+        mapWrapper.removeEventListener('transitionend', fixSize);
+      }
+    });
+  }
+  // Fallback in case transitionend doesn't fire (e.g. prefers-reduced-motion)
+  var mapFixIO = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        setTimeout(function() { map.invalidateSize(); }, 1200);
+        mapFixIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  mapFixIO.observe(mapEl);
 
   // CartoDB Dark Matter — vector tiles, zero calibration offset at any zoom level
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
